@@ -1,0 +1,74 @@
+---
+description: Domain, GIS, and coding guardrails for the wildfire medical resource map-table dashboard. Grounded in NWCG PMS 910 Event Point names and PMS 936 GeoPDF/symbology. v1 is GeoPDF-only.
+globs:
+alwaysApply: true
+---
+
+# Wildfire Incident Medical Resource Tracker
+
+## What This App Is
+
+A **two-pane web app**: import a GISS **geospatial PDF**, extract incident map points, and track **ambulances, EMTs, and REMS** with draggable markers and a live table. Location is two-way, but the **marker stays at the source while in transit** and moves **on arrival** (or on map drop).
+
+v1 is a **location and movement board** for a **single RADO** at ICP (5–50 resources). Not a clinical decision engine, ICS form replacement, or IWI/GAR/RTW system.
+
+Prefer a correct, reviewable point list over a clever extract that silently mislabels a drop point.
+
+## Canonical GIS references
+
+- **NWCG PMS 910** — Event Point / Helispots *names* and WGS84. Not a PDF schema.
+- **PMS 936** GeoOps and **PMS 936-1** — how Geospatial PDFs are produced.
+- **PMS 936 point feature symbology** — Session B snap targets plus operator adds: Drop Point, Junction, Helispot, Unimproved Helispot, Helibase, ICP, Camp, Staging Area, Safety Zone, Lookout, Incident Base.
+
+Do **not** invent further Event Point categories without asking. PMS 552 / 350-39 are later-phase only.
+
+Living spec: `PLANNING.md`.
+
+## Tech stack
+
+- Frontend: **Vite + React + TypeScript**
+- Map: **Leaflet** (true north; **no rotation**)
+- GeoPDF georegistration / extract: _unspecified until sample PDF is on disk_
+- Backend / DB / Auth: none in Phase 1 (in-memory store)
+- Hosting: _unspecified_
+
+## v1 import and placement
+
+- **GeoPDF only.** No Event GDB, shapefile, GeoJSON sidecar, NIFS, or GPS.
+- Georegister to **WGS84** before treating coordinates as map points.
+- Extract is best-effort. Review (accept / reject / relabel / **add**) before a point is a snap target.
+- Markers: firefighter, ambulance, off-road pickup (REMS).
+- **Never cover** an Event Point symbol. Offset dock; clock positions if shared.
+- **Closest point on drop** = nearest accepted MapPoint (geodesic).
+- **Type destination** does not move the marker until **arrival**.
+- Location cell allows **free text** plus aliases (`dp12`, “helispot 3”, “the ICP”).
+- Capability is **ALS / BLS only** (no ILS).
+- Map is **north-up only**.
+
+## Movement colors (locked)
+
+- At ICP/camp: **blue**, static
+- En route / moving: **yellow**, subtle pulse
+- Arrived at other location: **green**, static
+- Emergency/care: **red** overlay, manual toggle
+
+## Coding guardrails
+
+- Ask before adding Event Point categories or ICS aliases beyond those logged.
+- One placement store so table destination and map dock cannot diverge.
+- Do not put leader name/phone in URLs. No patient/PCR fields.
+- Cite PMS 910 / 936 when a map decision comes from them.
+
+## Do not scaffold unless asked
+
+- IWI, GAR, RTW, REMS dual reporting
+- ICS form replacement
+- Event GDB / NIFS / shapefile / live GPS
+- Map rotation, ILS
+
+## Testing expectations
+
+- Label normalization and aliases: tests required.
+- Closest-point + offset dock: tests required.
+- En-route stays at source; arrival moves marker: tests required.
+- Extract review states: tests required (Phase 2).
