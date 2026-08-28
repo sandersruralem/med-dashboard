@@ -5,7 +5,7 @@ Live Share board is convenience. **Save** and **Export** are how you survive a c
 ## Save (this browser)
 
 - **Save** writes snap points and units into this browser’s storage (origin-scoped).
-- Hosted Pages and LAN exe do **not** share the same storage — Export if you move machines.
+- Hosted Pages and the LAN USB folder do **not** share the same storage — Export if you move machines.
 - Success notice: snap points and units saved in this browser.
 
 ## Export

@@ -150,29 +150,20 @@ select {
 
 .workspace-split {
   flex: 0 0 10px;
+  align-self: stretch;
   margin: 0 -2px;
   padding: 0;
   border: none;
-  background: transparent;
+  border-radius: 99px;
+  background: rgba(26, 35, 48, 0.18);
   cursor: col-resize;
   position: relative;
   z-index: 2;
   touch-action: none;
 }
 
-.workspace-split::after {
-  content: "";
-  position: absolute;
-  top: 18%;
-  bottom: 18%;
-  left: 3px;
-  width: 4px;
-  border-radius: 99px;
-  background: rgba(26, 35, 48, 0.18);
-}
-
-.workspace-split:hover::after,
-.workspace-split:focus-visible::after {
+.workspace-split:hover,
+.workspace-split:focus-visible {
   background: #2b4c6f;
 }
 
@@ -245,6 +236,13 @@ select {
   padding: 0 1rem;
 }
 
+.side-section > .hint {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 0 1rem 0.6rem;
+}
+
 .pdf-upload input {
   display: none;
 }
@@ -300,8 +298,31 @@ select {
 }
 
 .side-section {
-  border-bottom: 1px solid var(--line);
-  padding-bottom: 0.4rem;
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 var(--snap-pct, 32%);
+  min-height: 0;
+  overflow: hidden;
+}
+
+.table-split {
+  flex: 0 0 10px;
+  align-self: stretch;
+  width: 100%;
+  margin: -2px 0;
+  padding: 0;
+  border: none;
+  border-radius: 99px;
+  background: rgba(26, 35, 48, 0.18);
+  cursor: row-resize;
+  position: relative;
+  z-index: 2;
+  touch-action: none;
+}
+
+.table-split:hover,
+.table-split:focus-visible {
+  background: #2b4c6f;
 }
 
 .section-head {
@@ -403,6 +424,25 @@ select {
   margin-top: 0.9rem;
 }
 
+.share-qr {
+  display: block;
+  width: 12rem;
+  height: 12rem;
+  margin: 0.75rem auto 0.5rem;
+  padding: 0.4rem;
+  background: #fff;
+  border-radius: 8px;
+}
+
+.share-link {
+  margin: 0.4rem 0 0;
+  font-size: 0.78rem;
+  line-height: 1.35;
+  word-break: break-all;
+  user-select: all;
+  color: var(--ink);
+}
+
 .check-list {
   list-style: none;
   margin: 0.6rem 0 0;
@@ -462,7 +502,8 @@ select {
   list-style: none;
   margin: 0;
   padding: 0.2rem 0.75rem 0.6rem;
-  max-height: 8rem;
+  flex: 1;
+  min-height: 0;
   overflow: auto;
   font-size: 0.78rem;
 }
@@ -503,7 +544,7 @@ select {
   display: flex;
   flex-direction: column;
   min-height: 0;
-  flex: 1;
+  flex: 1 1 auto;
   overflow: auto;
 }
 
@@ -567,6 +608,10 @@ select {
 .leaflet-host .leaflet-container {
   height: 100%;
   width: 100%;
+}
+
+.geopdf-tiles {
+  pointer-events: none;
 }
 
 .table-wrap {
@@ -970,15 +1015,6 @@ tr.drag-over td {
     width: 100%;
     margin: -2px 0;
     cursor: row-resize;
-  }
-
-  .workspace-split::after {
-    top: 3px;
-    bottom: auto;
-    left: 22%;
-    right: 22%;
-    width: auto;
-    height: 4px;
   }
 
   .map-pane,

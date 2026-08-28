@@ -1,6 +1,7 @@
 import { IncidentMap } from "./components/IncidentMap";
 import { PointReview } from "./components/PointReview";
 import { ResourceTable } from "./components/ResourceTable";
+import { ShareViewerDialog } from "./components/ShareViewerDialog";
 import { StoreProvider } from "./store";
 import { useCallback, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
 import { LiveRoomProvider, useLiveRoom } from "./live";
@@ -8,12 +9,16 @@ import { useStore } from "./store";
 
 const MIN = 32;
 const MAX = 78;
+const SNAP_MIN = 18;
+const SNAP_MAX = 70;
 
 function BoardApp() {
   const [mapPct, setMapPct] = useState(67);
+  const [snapPct, setSnapPct] = useState(32);
   const workspaceRef = useRef<HTMLDivElement>(null);
+  const tableRef = useRef<HTMLElement>(null);
   const { readOnly } = useStore();
-  const { roomId, role, status, message, shareBoard, copyViewerLink } = useLiveRoom();
+  const { roomId, role, status, message, viewerLink, shareBoard, copyViewerLink, dismissViewerLink } = useLiveRoom();
 
   const onSplitPointerDown = useCallback((e: ReactPointerEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -28,6 +33,28 @@ function BoardApp() {
         ? ((ev.clientY - box.top) / box.height) * 100
         : ((ev.clientX - box.left) / box.width) * 100;
       setMapPct(Math.min(MAX, Math.max(MIN, raw)));
+    };
+
+    const onUp = () => {
+      handle.removeEventListener("pointermove", onMove);
+      handle.removeEventListener("pointerup", onUp);
+      window.dispatchEvent(new Event("resize"));
+    };
+
+    handle.addEventListener("pointermove", onMove);
+    handle.addEventListener("pointerup", onUp);
+  }, []);
+
+  const onTableSplitPointerDown = useCallback((e: ReactPointerEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    const handle = e.currentTarget;
+    handle.setPointerCapture(e.pointerId);
+
+    const onMove = (ev: PointerEvent) => {
+      const box = tableRef.current?.getBoundingClientRect();
+      if (!box) return;
+      const raw = ((ev.clientY - box.top) / box.height) * 100;
+      setSnapPct(Math.min(SNAP_MAX, Math.max(SNAP_MIN, raw)));
     };
 
     const onUp = () => {
@@ -70,6 +97,7 @@ function BoardApp() {
             {message ? <span className="live-message">{message}</span> : null}
           </div>
         </header>
+        <ShareViewerDialog link={viewerLink} onClose={dismissViewerLink} onCopy={() => void copyViewerLink()} />
         {readOnly ? (
           <div className="read-only-banner">
             {status === "connecting"
@@ -95,8 +123,22 @@ function BoardApp() {
             aria-valuenow={Math.round(mapPct)}
             onPointerDown={onSplitPointerDown}
           />
-          <aside className="table-pane">
+          <aside
+            ref={tableRef}
+            className="table-pane"
+            style={{ ["--snap-pct" as string]: `${snapPct}%` }}
+          >
             <PointReview />
+            <button
+              type="button"
+              className="table-split"
+              aria-label="Resize snap points and units"
+              aria-orientation="horizontal"
+              aria-valuemin={SNAP_MIN}
+              aria-valuemax={SNAP_MAX}
+              aria-valuenow={Math.round(snapPct)}
+              onPointerDown={onTableSplitPointerDown}
+            />
             <ResourceTable />
           </aside>
         </div>

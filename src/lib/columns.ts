@@ -15,11 +15,11 @@ export type UnitColumnId = (typeof UNIT_COLUMNS)[number]["id"];
 export type ColumnVisibility = Record<UnitColumnId, boolean>;
 
 export const DEFAULT_COLUMNS: ColumnVisibility = {
-  vendor: true,
+  vendor: false,
   fireName: true,
   kind: true,
-  leaderName: true,
-  leaderPhone: true,
+  leaderName: false,
+  leaderPhone: false,
   capability: true,
   location: true,
   status: true,

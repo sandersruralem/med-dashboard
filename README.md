@@ -20,24 +20,22 @@ This is a **location and movement board** (typically 5–50 resources). It is no
 - Movement colors: blue (ICP/camp), yellow pulse (en route), green (arrived elsewhere), red (emergency/care — manual)
 - Capability **ALS / BLS** only
 - Save / Export / Import for snap points and units; optional live Share board (no leader name or phone in the URL)
+- Share board also sends the editor’s GeoPDF (bundled High Lava, or a file they added, max 20 MB)
 
 ## Run simply (field)
 
-On a development PC with Node installed, build the portable Windows exe once:
+Download **`MedBoard-LAN-portable.zip`** from the [latest GitHub Release](https://github.com/sandersruralem/med-dashboard/releases/latest) (or build it on a development PC with `npm.cmd run portable:pack`).
 
-```powershell
-cd C:\Cursor\Med_dashboard
-npm.cmd install
-npm.cmd run electron:pack
-```
+Copy the `MedBoard-LAN` folder to the RADO laptop (USB is fine). If the agency blocks running from removable media, copy the folder to the Desktop first. Double-click `Start-MedBoard.cmd` and leave the console open:
 
-Copy `release/MedBoard-LAN.exe` to the RADO laptop (USB is fine). Double-click it:
+1. The board opens in the default browser at `http://<this-laptop-LAN-IP>:8787` (or the next free port through **8796**).
+2. Click **Share board**. The copied link is `http://<LAN-IP>:<port>/#room=…` (never `127.0.0.1`) and includes the same GeoPDF the editor is using.
+3. Viewers on the incident LAN open that link or scan the QR. They do not need the folder.
+4. Closing the console stops the server. Viewers keep the last snapshot they already received.
 
-1. The board opens in a desktop window (local server on port **8787**, or the next free port through **8796**).
-2. Click **Share board** and send the copied LAN link to viewers on the same network.
-3. Closing the exe stops the server. Viewers keep the last snapshot they already received.
+Allow inbound TCP **8787–8796** if Windows Firewall prompts. The only executable in the folder is official **Node for Windows** (OpenJS-signed). See [docs/HOSTING.md](docs/HOSTING.md).
 
-Allow inbound TCP **8787–8796** if Windows Firewall prompts. Unsigned builds may be blocked by Smart App Control — see [docs/HOSTING.md](docs/HOSTING.md).
+**Hosted (WAN):** open **https://med-dashboard-8ov.pages.dev/** as the editor and click **Share board** from that origin only. A localhost editor does not control Pages viewers.
 
 ## Run simply (developers)
 
@@ -56,15 +54,17 @@ npm.cmd run dev
 npm.cmd run party:dev
 ```
 
+`electron:dev` is optional on a machine that already has Node. The field package for ICP is the USB folder, not an unsigned `.exe`.
+
 ## Documentation
 
 | Doc | Contents |
 | --- | --- |
 | [docs/operator/](docs/operator/) | **How to use the board on a wildfire incident** (start of shift through handoff) |
-| [docs/HOSTING.md](docs/HOSTING.md) | LAN exe packaging, firewall, Smart App Control / signing, Cloudflare Pages + PartyKit |
+| [docs/HOSTING.md](docs/HOSTING.md) | USB folder packaging, firewall, Cloudflare Pages + PartyKit |
 | [PLANNING.md](PLANNING.md) | Living product and GIS decisions |
 | [docs/samples/geopdf/](docs/samples/geopdf/) | Sample ops GeoPDF notes |
 
 ## Privacy
 
-Do not put incident name, leader name, or phone in URLs, exe names, or env vars. Anyone with a viewer link can see board fields (including leader contact) — treat the link like exported unit JSON.
+Do not put incident name, leader name, or phone in URLs, folder names, zip names, or env vars. Anyone with a viewer link can read the board (including leader contact) and the **shared ops map** — treat the link like exported unit JSON.

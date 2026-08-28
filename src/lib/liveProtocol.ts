@@ -1,4 +1,8 @@
+import type { MapMeta } from "./mapShare";
 import type { BoardSnapshot, MapPointCategory } from "../types";
+
+export type { MapMeta } from "./mapShare";
+export { isMapMeta } from "./mapShare";
 
 export const MAX_LIVE_MESSAGE_BYTES = 120 * 1024;
 export const LIVE_EDITOR_KEY_PREFIX = "med-dashboard-editor:";
@@ -91,8 +95,11 @@ export function isBoardSnapshot(value: unknown): value is BoardSnapshot {
 }
 
 export type LiveRole = "editor" | "viewer";
-export type ClientLiveMessage = { type: "snapshot"; snapshot: BoardSnapshot };
-export type ServerLiveMessage =
-  | { type: "init"; role: LiveRole; snapshot: BoardSnapshot | null }
+export type ClientLiveMessage =
   | { type: "snapshot"; snapshot: BoardSnapshot }
+  | { type: "map-ready"; map: MapMeta };
+export type ServerLiveMessage =
+  | { type: "init"; role: LiveRole; snapshot: BoardSnapshot | null; map: MapMeta | null }
+  | { type: "snapshot"; snapshot: BoardSnapshot }
+  | { type: "map-ready"; map: MapMeta }
   | { type: "error"; message: string };

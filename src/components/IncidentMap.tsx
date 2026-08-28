@@ -1,12 +1,14 @@
 import { ImageOverlay, MapContainer, Marker, Popup, TileLayer, useMap, useMapEvents } from "react-leaflet";
 import { DivIcon, type DragEndEvent, type LeafletMouseEvent } from "leaflet";
 import { useEffect, useMemo, useRef, useState, type MutableRefObject } from "react";
+import { GeopdfTileLayer } from "./GeopdfTileLayer";
 import { classifyLabel } from "../lib/classifyLabel";
+import { BUNDLED_GEOPDF_NAME, loadBundledGeopdfBytes, overlayFileFromBytes } from "../lib/bundledGeopdf";
 import { loadGeopdf } from "../lib/loadGeopdf";
+import { roomFromLocationHash } from "../lib/liveProtocol";
 import { unitMarkerLabel, unitMarkerSrc } from "../lib/unitMarker";
 import { useStore } from "../store";
 import { rowTone, CATEGORY_LABELS, type Capability, type MapPoint, type MapPointCategory, type MarkerKind } from "../types";
-import samplePdfUrl from "../../docs/samples/geopdf/ops_arch_e_land_20260824_1905_HighLava_WAGPF000684_0825day.pdf?url";
 
 const CATEGORIES: MapPointCategory[] = [
   "drop_point",
@@ -108,20 +110,23 @@ export function IncidentMap() {
   const [label, setLabel] = useState("ICP");
   const [category, setCategory] = useState<MapPointCategory>("icp");
   const [placeMode, setPlaceMode] = useState(true);
+  const [preview, setPreview] = useState(true);
   const loadedOnce = useRef(false);
   const skipClickUntil = useRef(0);
 
   useEffect(() => {
     if (loadedOnce.current) return;
     loadedOnce.current = true;
+    const liveViewer = Boolean(roomFromLocationHash(window.location.hash)) && readOnly;
+    if (liveViewer) return;
     let cancelled = false;
     (async () => {
       setPdfBusy(true);
       try {
-        const res = await fetch(samplePdfUrl);
-        const buf = new Uint8Array(await res.arrayBuffer());
-        const loaded = await loadGeopdf(buf, "High Lava ops map");
-        if (!cancelled) setOverlay(loaded);
+        const buf = await loadBundledGeopdfBytes();
+        const loaded = await loadGeopdf(buf, BUNDLED_GEOPDF_NAME);
+        const file = await overlayFileFromBytes(buf, BUNDLED_GEOPDF_NAME);
+        if (!cancelled) setOverlay(loaded, null, file);
       } catch (err) {
         if (!cancelled) setOverlay(null, err instanceof Error ? err.message : "Failed to load GeoPDF");
       } finally {
@@ -131,7 +136,13 @@ export function IncidentMap() {
     return () => {
       cancelled = true;
     };
-  }, [setOverlay, setPdfBusy]);
+  }, [setOverlay, setPdfBusy, readOnly]);
+
+  useEffect(() => {
+    setPreview(true);
+    const timer = window.setTimeout(() => setPreview(false), 12000);
+    return () => window.clearTimeout(timer);
+  }, [overlay]);
 
   const atCounts = useMemo(() => {
     const counts = new Map<string, string[]>();
@@ -170,7 +181,8 @@ export function IncidentMap() {
     try {
       const buf = new Uint8Array(await file.arrayBuffer());
       const loaded = await loadGeopdf(buf, file.name);
-      setOverlay(loaded);
+      const overlayFile = await overlayFileFromBytes(buf, file.name);
+      setOverlay(loaded, null, overlayFile);
     } catch (err) {
       setOverlay(null, err instanceof Error ? err.message : "Failed to load GeoPDF");
     } finally {
@@ -185,13 +197,23 @@ export function IncidentMap() {
           <div>
             <h2>Incident map</h2>
             <p className="pdf-status">
-              {pdfBusy ? "Loading High Lava ops map…" : pdfError ? pdfError : overlay ? overlay.name : "No PDF"}
+              {pdfBusy
+                ? readOnly
+                  ? "Loading shared map…"
+                  : "Loading High Lava ops map…"
+                : pdfError
+                  ? pdfError
+                  : overlay
+                    ? overlay.name
+                    : "No PDF"}
             </p>
           </div>
-          <label className="btn ghost pdf-upload">
-            Replace PDF
-            <input type="file" accept="application/pdf" onChange={(e) => onFile(e.target.files?.[0])} />
-          </label>
+          {!readOnly ? (
+            <label className="btn ghost pdf-upload">
+              Add PDF
+              <input type="file" accept="application/pdf" onChange={(e) => onFile(e.target.files?.[0])} />
+            </label>
+          ) : null}
         </div>
         {!readOnly ? <div className="place-form">
           <input
@@ -233,7 +255,10 @@ export function IncidentMap() {
         />
         {overlay ? (
           <>
-            <ImageOverlay url={overlay.imageUrl} bounds={overlay.bounds} opacity={1} zIndex={200} />
+            {preview && overlay.imageUrl ? (
+              <ImageOverlay url={overlay.imageUrl} bounds={overlay.bounds} opacity={1} zIndex={199} />
+            ) : null}
+            <GeopdfTileLayer overlay={overlay} onReady={() => setPreview(false)} />
             <FitOverlay bounds={overlay.bounds} />
           </>
         ) : null}

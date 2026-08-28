@@ -45,8 +45,10 @@ The list sorts A–Z with numeric awareness (DP-2 before DP-10).
 
 When Planning drops a new ops map:
 
-1. Load the new GeoPDF.
+1. Load the new GeoPDF (**Add PDF** on the map).
 2. Re-review snap points for that product.
 3. Resource placements stay in WGS84; update the map and points, do not wipe the unit table unless Import replaces units on purpose.
+
+If **Share board** is already live, Add PDF replaces the room map. Viewers reload the new GeoPDF without a refresh; units stay on the board.
 
 Next: [Units and movement](03-units-and-movement.md) · Back: [Start of shift](01-start-of-shift.md)

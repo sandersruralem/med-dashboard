@@ -1,6 +1,6 @@
 # 4. Live viewers
 
-**Share board** gives MEDL, SITL, and others a live read-only copy of snap points, units, and placements. The GeoPDF file itself is **not** synced — each browser uses its own loaded or bundled map.
+**Share board** gives MEDL, SITL, and others a live read-only copy of snap points, units, placements, and the **same GeoPDF** the editor is using (bundled High Lava or a PDF they added). Viewers tile that file locally. Anyone with the link can read the ops map.
 
 ## Editor vs viewer
 
@@ -12,27 +12,29 @@
 
 Start a **new** Share board from the RADO’s saved/exported board if the editor session is lost.
 
-## LAN (MedBoard-LAN.exe)
+## LAN (USB folder)
 
-1. On the editor window, click **Share board**.
-2. The copied link looks like `http://<this-laptop-LAN-IP>:<port>/#room=…` (port usually **8787**).
-3. Viewers on the **same incident LAN** open that URL in Edge or Chrome.
+1. On the editor browser that `Start-MedBoard.cmd` opened, click **Share board**.
+2. The dialog shows a QR code and a link like `http://<this-laptop-LAN-IP>:<port>/#room=…` (port usually **8787**). It is never `127.0.0.1`.
+3. Viewers on the **same incident LAN** open that URL or scan the QR in Edge or Chrome.
 4. Allow firewall inbound TCP **8787–8796** on the RADO machine if viewers cannot connect.
 
 Do not put incident name, leader name, or phone in the link. The room id is opaque on purpose.
 
 ## Hosted (Cloudflare Pages + live room)
 
-1. Open the **Pages HTTPS** URL as the editor (not localhost).
-2. Click **Share board** so the editor key is stored on that origin.
-3. Copied link is `https://<pages-host>/#room=…`.
+1. Open **https://med-dashboard-8ov.pages.dev/** as the editor (not localhost).
+2. Click **Share board** so the editor key is stored on that origin. The dialog shows the HTTPS link and QR.
+3. Copied link is `https://med-dashboard-8ov.pages.dev/#room=…`.
 4. A localhost editor does **not** control Pages viewers even if the room id looks similar.
+
+Live sockets use the PartyKit host configured at build time (see [HOSTING.md](../HOSTING.md)). Do not put that hostname in a chat title with incident or leader details.
 
 Deploy details: [HOSTING.md](../HOSTING.md).
 
 ## Security mindset
 
-Anyone with the viewer URL can read the board, including leader contact fields. Treat the link like the exported units JSON. Prefer incident LAN or a known HTTPS origin — not a public chat channel.
+Anyone with the viewer URL can read the board, including leader contact fields and the shared ops map. Treat the link like the exported units JSON. Prefer incident LAN or a known HTTPS origin — not a public chat channel.
 
 ## Disconnect behavior
 

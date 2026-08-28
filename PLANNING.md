@@ -281,6 +281,7 @@ The map records **where resources are**. It does not prescribe care.
 | 2026-08-26 | Freeze the functional local board as `v1.0.0`; live sharing starts version 2.0 | Preserve a stable field-usable baseline before network features | Builder (user) | 0.1 development version |
 | 2026-08-26 | Hosted sharing is one RADO editor plus live read-only viewers using Cloudflare Pages + PartyKit | Preserve the one-keyboard operating model while giving MEDL/SITL a current view | Builder (user) | Local-only persistence |
 | 2026-08-28 | Freeze the live-viewer baseline as `v2.0.0` (editor + read-only viewers, LAN share links, Pages helpers); production cloud-prem/Pages deploy continues after the tag | Lock a reviewable network-capable board before public GitHub and hosted deploy | Builder (user) | Uncommitted v2 development |
+| 2026-08-28 | Freeze `v2.1.0` as Share-the-GeoPDF (bundled hash or room HTTP PUT/GET, 20 MB) plus the USB folder field package | Viewers need the same ops map as the editor; unsigned exe is not the ICP artifact | Builder (user) | v2.0.0 snapshot-only share; GeoPDF stayed local |
 | 2026-08-25 | Phase 1 stack start: Vite + React + TypeScript; north-up map; client in-memory store; PDF file upload | Prepare-to-build | Builder | Unspecified stack |
 | 2026-08-25 | High Lava PDF is raster (JP2 tiles); no text extract. Overlay via GPTS + click-to-add points | Probe of sample ops map | Builder | Text-extract pipeline |
 

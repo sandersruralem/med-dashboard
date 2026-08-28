@@ -1,5 +1,8 @@
 node_modules
 dist
+electron-dist
+release
+.cache
 .partykit
 .DS_Store
 *.local

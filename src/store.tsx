@@ -4,6 +4,7 @@ import { findPointByLabel, labelsMatch } from "./lib/labels";
 import { EMPTY_BOARD_SNAPSHOT, LIVE_EDITOR_KEY_PREFIX, roomFromLocationHash } from "./lib/liveProtocol";
 import { seedPlacements, seedResources } from "./seed";
 import type { LoadedGeopdf } from "./lib/loadGeopdf";
+import type { OverlayFile } from "./lib/mapShare";
 import type {
   BoardSnapshot,
   DutyStatus,
@@ -23,9 +24,10 @@ export interface Store {
   setReadOnly: (readOnly: boolean) => void;
   replaceRemoteSnapshot: (snapshot: BoardSnapshot) => void;
   overlay: LoadedGeopdf | null;
+  overlayFile: OverlayFile | null;
   pdfError: string | null;
   pdfBusy: boolean;
-  setOverlay: (overlay: LoadedGeopdf | null, error?: string | null) => void;
+  setOverlay: (overlay: LoadedGeopdf | null, error?: string | null, file?: OverlayFile | null) => void;
   setPdfBusy: (busy: boolean) => void;
   addPoint: (lat: number, lon: number, label: string, category: MapPointCategory) => void;
   movePoint: (id: string, lat: number, lon: number) => void;
@@ -134,6 +136,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [resources, setResources] = useState(hold ? EMPTY_BOARD_SNAPSHOT.resources : boot.resources);
   const [placements, setPlacements] = useState(hold ? EMPTY_BOARD_SNAPSHOT.placements : boot.placements);
   const [overlay, setOverlayState] = useState<LoadedGeopdf | null>(null);
+  const [overlayFile, setOverlayFile] = useState<OverlayFile | null>(null);
   const [pdfError, setPdfError] = useState<string | null>(null);
   const [pdfBusy, setPdfBusy] = useState(false);
   const [readOnly, setReadOnlyState] = useState(hold);
@@ -147,6 +150,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     placements: boot.placements,
   });
   const skipAutosave = useRef(true);
+  const overlayRef = useRef<LoadedGeopdf | null>(null);
+  const prevOverlayRef = useRef<LoadedGeopdf | null>(null);
+  overlayRef.current = overlay;
 
   useEffect(() => {
     if (skipAutosave.current) {
@@ -158,6 +164,24 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       writeStoredBoard(localBoard.current);
     }
   }, [points, resources, placements, readOnly]);
+
+  useEffect(() => {
+    const prev = prevOverlayRef.current;
+    prevOverlayRef.current = overlay;
+    if (!prev || prev === overlay) return;
+    const doomed = prev;
+    const timer = window.setTimeout(() => doomed.dispose(), 750);
+    return () => {
+      window.clearTimeout(timer);
+      doomed.dispose();
+    };
+  }, [overlay]);
+
+  useEffect(() => {
+    return () => {
+      overlayRef.current?.dispose();
+    };
+  }, []);
 
   const value = useMemo<Store>(
     () => ({
@@ -186,11 +210,14 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         setBoardNotice(null);
       },
       overlay,
+      overlayFile,
       pdfError,
       pdfBusy,
-      setOverlay(next, error = null) {
+      setOverlay(next, error = null, file) {
         setOverlayState(next);
         setPdfError(error);
+        if (file !== undefined) setOverlayFile(file);
+        else if (!next) setOverlayFile(null);
       },
       setPdfBusy,
       addPoint(lat, lon, label, category) {
@@ -375,7 +402,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         setBoardNotice(`Imported ${nextResources.length} unit${nextResources.length === 1 ? "" : "s"}.`);
       },
     }),
-    [points, resources, placements, overlay, pdfError, pdfBusy, boardNotice, relocatingPointId, readOnly],
+    [points, resources, placements, overlay, overlayFile, pdfError, pdfBusy, boardNotice, relocatingPointId, readOnly],
   );
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
