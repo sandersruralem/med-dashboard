@@ -70,7 +70,15 @@ function BoardApp() {
             {message ? <span className="live-message">{message}</span> : null}
           </div>
         </header>
-        {readOnly ? <div className="read-only-banner">Live view — read only</div> : null}
+        {readOnly ? (
+          <div className="read-only-banner">
+            {status === "connecting"
+              ? "Connecting to live board…"
+              : status === "disconnected"
+                ? "Live view disconnected — read only"
+                : "Live view — read only"}
+          </div>
+        ) : null}
         <div
           ref={workspaceRef}
           className="workspace"

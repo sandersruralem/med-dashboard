@@ -10,8 +10,11 @@ import {
   type ReactNode,
 } from "react";
 import {
+  EMPTY_BOARD_SNAPSHOT,
+  LIVE_EDITOR_KEY_PREFIX,
   MAX_LIVE_MESSAGE_BYTES,
   isBoardSnapshot,
+  roomFromLocationHash,
   type LiveRole,
   type ServerLiveMessage,
 } from "./lib/liveProtocol";
@@ -30,12 +33,10 @@ interface LiveRoom {
 }
 
 const LiveRoomContext = createContext<LiveRoom | null>(null);
-const EDITOR_KEY_PREFIX = "med-dashboard-editor:";
 const PUSH_DEBOUNCE_MS = 350;
 
 function roomFromHash(): string | null {
-  const room = new URLSearchParams(window.location.hash.replace(/^#/, "")).get("room")?.trim() ?? "";
-  return /^[A-Za-z0-9_-]{1,128}$/.test(room) ? room : null;
+  return roomFromLocationHash(window.location.hash);
 }
 
 function isLoopback(host: string): boolean {
@@ -96,6 +97,7 @@ export function LiveRoomProvider({ children }: { children: ReactNode }) {
   const replaceRemoteRef = useRef(replaceRemoteSnapshot);
   const setReadOnlyRef = useRef(setReadOnly);
   const roleRef = useRef<LiveRole | null>(null);
+  const receivedRemoteRef = useRef(false);
 
   snapshotRef.current = snapshot;
   replaceRemoteRef.current = replaceRemoteSnapshot;
@@ -115,14 +117,23 @@ export function LiveRoomProvider({ children }: { children: ReactNode }) {
     setMessage(null);
 
     if (!roomId) {
+      receivedRemoteRef.current = false;
       setReadOnlyRef.current(false);
       setStatus("local");
       return;
     }
 
-    setReadOnlyRef.current(true);
+    receivedRemoteRef.current = false;
     setStatus("connecting");
-    const editorKey = sessionStorage.getItem(`${EDITOR_KEY_PREFIX}${roomId}`);
+    const editorKey = sessionStorage.getItem(`${LIVE_EDITOR_KEY_PREFIX}${roomId}`);
+    // Editors keep working locally until init assigns a role. Viewers lock and
+    // hide the last local board so it cannot look like the live incident.
+    if (editorKey) {
+      setReadOnlyRef.current(false);
+    } else {
+      setReadOnlyRef.current(true);
+      replaceRemoteRef.current(EMPTY_BOARD_SNAPSHOT);
+    }
     let cancelled = false;
     let socket: PartySocket | null = null;
 
@@ -152,12 +163,22 @@ export function LiveRoomProvider({ children }: { children: ReactNode }) {
         setMessage(null);
       });
       socket.addEventListener("close", () => {
+        if (cancelled) return;
         setStatus("disconnected");
-        setMessage("Disconnected — showing the last received board.");
+        setMessage(
+          receivedRemoteRef.current
+            ? "Disconnected — showing the last received board."
+            : "Disconnected — live board is unavailable.",
+        );
       });
       socket.addEventListener("error", () => {
+        if (cancelled) return;
         setStatus("disconnected");
-        setMessage("Live connection error — showing the last board.");
+        setMessage(
+          receivedRemoteRef.current
+            ? "Live connection error — showing the last board."
+            : "Live connection error — live board is unavailable.",
+        );
       });
       socket.addEventListener("message", (event) => {
         if (typeof event.data !== "string") return;
@@ -186,13 +207,16 @@ export function LiveRoomProvider({ children }: { children: ReactNode }) {
               }
             }, 0);
           } else if (parsed.snapshot && isBoardSnapshot(parsed.snapshot)) {
+            receivedRemoteRef.current = true;
             replaceRemoteRef.current(parsed.snapshot);
           } else if (parsed.role === "viewer") {
-            replaceRemoteRef.current({ points: [], resources: [], placements: [] });
+            receivedRemoteRef.current = true;
+            replaceRemoteRef.current(EMPTY_BOARD_SNAPSHOT);
           }
           return;
         }
         if (parsed.type === "snapshot" && roleRef.current === "viewer" && isBoardSnapshot(parsed.snapshot)) {
+          receivedRemoteRef.current = true;
           replaceRemoteRef.current(parsed.snapshot);
           setStatus("connected");
         }
@@ -233,7 +257,7 @@ export function LiveRoomProvider({ children }: { children: ReactNode }) {
   const shareBoard = useCallback(async () => {
     const nextRoom = crypto.randomUUID();
     const editorKey = crypto.randomUUID();
-    sessionStorage.setItem(`${EDITOR_KEY_PREFIX}${nextRoom}`, editorKey);
+    sessionStorage.setItem(`${LIVE_EDITOR_KEY_PREFIX}${nextRoom}`, editorKey);
     window.location.hash = new URLSearchParams({ room: nextRoom }).toString();
     try {
       const link = await viewerUrl(nextRoom);

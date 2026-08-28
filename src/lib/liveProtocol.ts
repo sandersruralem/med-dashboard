@@ -1,6 +1,13 @@
 import type { BoardSnapshot, MapPointCategory } from "../types";
 
 export const MAX_LIVE_MESSAGE_BYTES = 120 * 1024;
+export const LIVE_EDITOR_KEY_PREFIX = "med-dashboard-editor:";
+export const EMPTY_BOARD_SNAPSHOT: BoardSnapshot = { points: [], resources: [], placements: [] };
+
+export function roomFromLocationHash(hash: string): string | null {
+  const room = new URLSearchParams(hash.replace(/^#/, "")).get("room")?.trim() ?? "";
+  return /^[A-Za-z0-9_-]{1,128}$/.test(room) ? room : null;
+}
 
 const CATEGORIES = new Set<MapPointCategory>([
   "drop_point",

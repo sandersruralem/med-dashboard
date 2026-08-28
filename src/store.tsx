@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { loadStoredBoard, writeStoredBoard } from "./lib/boardFile";
 import { findPointByLabel, labelsMatch } from "./lib/labels";
+import { EMPTY_BOARD_SNAPSHOT, LIVE_EDITOR_KEY_PREFIX, roomFromLocationHash } from "./lib/liveProtocol";
 import { seedPlacements, seedResources } from "./seed";
 import type { LoadedGeopdf } from "./lib/loadGeopdf";
 import type {
@@ -94,6 +95,14 @@ function initialBoard(): {
   return { points: [], resources: seedResources, placements: seedPlacements, restored: false };
 }
 
+/** Viewer live links must not flash this browser's last local board. */
+function viewerLiveHold(): boolean {
+  if (typeof window === "undefined") return false;
+  const room = roomFromLocationHash(window.location.hash);
+  if (!room) return false;
+  return sessionStorage.getItem(`${LIVE_EDITOR_KEY_PREFIX}${room}`) == null;
+}
+
 /** A to Z, with DP-2 ahead of DP-10. */
 function sortedByLabel(points: MapPoint[]): MapPoint[] {
   return [...points].sort((a, b) => a.label.localeCompare(b.label, undefined, { numeric: true, sensitivity: "base" }));
@@ -120,15 +129,16 @@ function attachEmpty(placements: ResourcePlacement[], point: MapPoint): Resource
 
 export function StoreProvider({ children }: { children: ReactNode }) {
   const [boot] = useState(initialBoard);
-  const [points, setPoints] = useState(boot.points);
-  const [resources, setResources] = useState(boot.resources);
-  const [placements, setPlacements] = useState(boot.placements);
+  const [hold] = useState(viewerLiveHold);
+  const [points, setPoints] = useState(hold ? EMPTY_BOARD_SNAPSHOT.points : boot.points);
+  const [resources, setResources] = useState(hold ? EMPTY_BOARD_SNAPSHOT.resources : boot.resources);
+  const [placements, setPlacements] = useState(hold ? EMPTY_BOARD_SNAPSHOT.placements : boot.placements);
   const [overlay, setOverlayState] = useState<LoadedGeopdf | null>(null);
   const [pdfError, setPdfError] = useState<string | null>(null);
   const [pdfBusy, setPdfBusy] = useState(false);
-  const [readOnly, setReadOnlyState] = useState(false);
+  const [readOnly, setReadOnlyState] = useState(hold);
   const [boardNotice, setBoardNotice] = useState<string | null>(
-    boot.restored ? "Restored the last saved board in this browser." : null,
+    hold ? null : boot.restored ? "Restored the last saved board in this browser." : null,
   );
   const [relocatingPointId, setRelocatingPointId] = useState<string | null>(null);
   const localBoard = useRef<BoardSnapshot>({
@@ -173,6 +183,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         setResources(snapshot.resources);
         setPlacements(snapshot.placements);
         setRelocatingPointId(null);
+        setBoardNotice(null);
       },
       overlay,
       pdfError,
