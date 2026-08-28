@@ -278,6 +278,9 @@ The map records **where resources are**. It does not prescribe care.
 | 2026-08-25 | Daily PDF replace keeps resource WGS84 placements; update map/points | Session B #10 | SME | Reset-on-replace option |
 | 2026-08-25 | Map is true north only; no rotation | Session B #12 | SME | Zoom/pan/rotate requirement |
 | 2026-08-25 | Primary operator is RADO | PLANNING §8 edit | Builder (user) | MEDL-only operator |
+| 2026-08-26 | Freeze the functional local board as `v1.0.0`; live sharing starts version 2.0 | Preserve a stable field-usable baseline before network features | Builder (user) | 0.1 development version |
+| 2026-08-26 | Hosted sharing is one RADO editor plus live read-only viewers using Cloudflare Pages + PartyKit | Preserve the one-keyboard operating model while giving MEDL/SITL a current view | Builder (user) | Local-only persistence |
+| 2026-08-28 | Freeze the live-viewer baseline as `v2.0.0` (editor + read-only viewers, LAN share links, Pages helpers); production cloud-prem/Pages deploy continues after the tag | Lock a reviewable network-capable board before public GitHub and hosted deploy | Builder (user) | Uncommitted v2 development |
 | 2026-08-25 | Phase 1 stack start: Vite + React + TypeScript; north-up map; client in-memory store; PDF file upload | Prepare-to-build | Builder | Unspecified stack |
 | 2026-08-25 | High Lava PDF is raster (JP2 tiles); no text extract. Overlay via GPTS + click-to-add points | Probe of sample ops map | Builder | Text-extract pipeline |
 

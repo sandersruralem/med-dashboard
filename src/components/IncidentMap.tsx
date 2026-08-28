@@ -101,6 +101,7 @@ export function IncidentMap() {
     cancelRelocate,
     setOverlay,
     setPdfBusy,
+    readOnly,
   } = useStore();
   const accepted = points.filter((p) => p.review === "accepted");
   const moving = accepted.find((p) => p.id === relocatingPointId);
@@ -192,7 +193,7 @@ export function IncidentMap() {
             <input type="file" accept="application/pdf" onChange={(e) => onFile(e.target.files?.[0])} />
           </label>
         </div>
-        <div className="place-form">
+        {!readOnly ? <div className="place-form">
           <input
             className="field"
             value={label}
@@ -223,7 +224,7 @@ export function IncidentMap() {
               </button>
             </>
           ) : null}
-        </div>
+        </div> : null}
       </div>
       <MapContainer className="leaflet-host" center={[45.88, -122.11]} zoom={11} scrollWheelZoom attributionControl>
         <TileLayer
@@ -237,7 +238,7 @@ export function IncidentMap() {
           </>
         ) : null}
         <PlaceClick
-          enabled={Boolean(overlay) && (Boolean(moving) || placeMode)}
+          enabled={!readOnly && Boolean(overlay) && (Boolean(moving) || placeMode)}
           skipUntil={skipClickUntil}
           onPlace={(lat, lon) => {
             if (moving) {
@@ -254,12 +255,12 @@ export function IncidentMap() {
           <Marker
             key={pt.id}
             position={[pt.lat, pt.lon]}
-            draggable
+            draggable={!readOnly}
             zIndexOffset={-200}
             icon={snapIcon(pt.id === relocatingPointId)}
             eventHandlers={{ dragend: (e) => onSnapDragEnd(pt.id, e as DragEndEvent) }}
           >
-            <Popup>{pt.label} — drag or use Move in the snap list</Popup>
+            <Popup>{readOnly ? pt.label : `${pt.label} — drag or use Move in the snap list`}</Popup>
           </Marker>
         ))}
         {resources.map((r) => {
@@ -274,7 +275,7 @@ export function IncidentMap() {
             <Marker
               key={r.id}
               position={position}
-              draggable
+              draggable={!readOnly}
               icon={resourceIcon(r.kind, r.capability, rowTone(place), r.fireName)}
               eventHandlers={{ dragend: (e) => onDragEnd(r.id, e as DragEndEvent) }}
             >

@@ -7,6 +7,7 @@ interface Props {
   options: string[];
   onChange: (value: string) => void;
   ariaLabel: string;
+  disabled?: boolean;
 }
 
 const LIST_MAX = 220;
@@ -18,7 +19,7 @@ interface Box {
   maxHeight: number;
 }
 
-export function LocationCombobox({ value, options, onChange, ariaLabel }: Props) {
+export function LocationCombobox({ value, options, onChange, ariaLabel, disabled = false }: Props) {
   const [draft, setDraft] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(-1);
@@ -173,6 +174,7 @@ export function LocationCombobox({ value, options, onChange, ariaLabel }: Props)
         aria-autocomplete="list"
         role="combobox"
         placeholder="Search or type"
+        disabled={disabled}
         onFocus={() => {
           setOpen(true);
           setActive(-1);
@@ -197,6 +199,7 @@ export function LocationCombobox({ value, options, onChange, ariaLabel }: Props)
         className="combo-toggle"
         tabIndex={-1}
         aria-label={`${open ? "Hide" : "Show"} location list`}
+        disabled={disabled}
         onMouseDown={(e) => e.preventDefault()}
         onClick={() => {
           if (open) {

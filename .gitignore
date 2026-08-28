@@ -1,5 +1,8 @@
 node_modules
 dist
+.partykit
 .DS_Store
 *.local
 *.tsbuildinfo
+.env*
+!.env.example

@@ -4,7 +4,8 @@ import { BoardIoBar } from "./BoardIoBar";
 import { useStore } from "../store";
 
 export function PointReview() {
-  const { points, setPointReview, deletePoint, saveBoard, replacePoints, relocatingPointId, beginRelocate } = useStore();
+  const { points, setPointReview, deletePoint, saveBoard, replacePoints, relocatingPointId, beginRelocate, readOnly } =
+    useStore();
 
   function importPoints(text: string) {
     const parsed = parseImportedJson(text);
@@ -27,6 +28,7 @@ export function PointReview() {
             onSave={saveBoard}
             onExport={() => downloadJson(stampFilename("snap-points"), snapPointsPayload(points))}
             onImportText={importPoints}
+            readOnly={readOnly}
           />
           <span className="count">{points.filter((p) => p.review === "accepted").length}</span>
         </div>
@@ -41,7 +43,7 @@ export function PointReview() {
                 <strong>{p.label}</strong>
                 <em>{CATEGORY_LABELS[p.category]}</em>
               </span>
-              <span className="point-actions">
+              {!readOnly ? <span className="point-actions">
                 {p.review !== "rejected" ? (
                   <>
                     <button
@@ -65,7 +67,7 @@ export function PointReview() {
                     </button>
                   </>
                 )}
-              </span>
+              </span> : null}
             </li>
           ))}
         </ul>

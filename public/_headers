@@ -1,0 +1,7 @@
+/pdfjs-wasm/*
+  Content-Type: application/wasm
+  Cache-Control: public, max-age=31536000, immutable
+
+/assets/*.pdf
+  Content-Type: application/pdf
+  Cache-Control: public, max-age=31536000, immutable

@@ -69,6 +69,12 @@ export interface ResourcePlacement {
   emergencyCare: boolean;
 }
 
+export interface BoardSnapshot {
+  points: MapPoint[];
+  resources: MedicalResource[];
+  placements: ResourcePlacement[];
+}
+
 export function isInTransit(placement: ResourcePlacement): boolean {
   return placement.duty === "enroute";
 }

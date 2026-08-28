@@ -3,12 +3,24 @@ import { loadStoredBoard, writeStoredBoard } from "./lib/boardFile";
 import { findPointByLabel, labelsMatch } from "./lib/labels";
 import { seedPlacements, seedResources } from "./seed";
 import type { LoadedGeopdf } from "./lib/loadGeopdf";
-import type { DutyStatus, MapPoint, MapPointCategory, MedicalResource, MovementState, ResourcePlacement } from "./types";
+import type {
+  BoardSnapshot,
+  DutyStatus,
+  MapPoint,
+  MapPointCategory,
+  MedicalResource,
+  MovementState,
+  ResourcePlacement,
+} from "./types";
 
-interface Store {
+export interface Store {
   points: MapPoint[];
   resources: MedicalResource[];
   placements: ResourcePlacement[];
+  snapshot: BoardSnapshot;
+  readOnly: boolean;
+  setReadOnly: (readOnly: boolean) => void;
+  replaceRemoteSnapshot: (snapshot: BoardSnapshot) => void;
   overlay: LoadedGeopdf | null;
   pdfError: string | null;
   pdfBusy: boolean;
@@ -114,10 +126,16 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const [overlay, setOverlayState] = useState<LoadedGeopdf | null>(null);
   const [pdfError, setPdfError] = useState<string | null>(null);
   const [pdfBusy, setPdfBusy] = useState(false);
+  const [readOnly, setReadOnlyState] = useState(false);
   const [boardNotice, setBoardNotice] = useState<string | null>(
     boot.restored ? "Restored the last saved board in this browser." : null,
   );
   const [relocatingPointId, setRelocatingPointId] = useState<string | null>(null);
+  const localBoard = useRef<BoardSnapshot>({
+    points: boot.points,
+    resources: boot.resources,
+    placements: boot.placements,
+  });
   const skipAutosave = useRef(true);
 
   useEffect(() => {
@@ -125,14 +143,37 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       skipAutosave.current = false;
       return;
     }
-    writeStoredBoard({ points, resources, placements });
-  }, [points, resources, placements]);
+    if (!readOnly) {
+      localBoard.current = { points, resources, placements };
+      writeStoredBoard(localBoard.current);
+    }
+  }, [points, resources, placements, readOnly]);
 
   const value = useMemo<Store>(
     () => ({
       points,
       resources,
       placements,
+      snapshot: { points, resources, placements },
+      readOnly,
+      setReadOnly(next) {
+        if (next === readOnly) return;
+        if (next) {
+          localBoard.current = { points, resources, placements };
+        } else {
+          setPoints(localBoard.current.points);
+          setResources(localBoard.current.resources);
+          setPlacements(localBoard.current.placements);
+        }
+        setReadOnlyState(next);
+        setRelocatingPointId(null);
+      },
+      replaceRemoteSnapshot(snapshot) {
+        setPoints(sortedByLabel(snapshot.points));
+        setResources(snapshot.resources);
+        setPlacements(snapshot.placements);
+        setRelocatingPointId(null);
+      },
       overlay,
       pdfError,
       pdfBusy,
@@ -142,6 +183,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       },
       setPdfBusy,
       addPoint(lat, lon, label, category) {
+        if (readOnly) return;
         const point: MapPoint = {
           id: `pt-${crypto.randomUUID()}`,
           category,
@@ -155,20 +197,24 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         setPlacements((prev) => attachEmpty(prev, point));
       },
       movePoint(id, lat, lon) {
+        if (readOnly) return;
         setPoints((prev) => prev.map((p) => (p.id === id ? { ...p, lat, lon } : p)));
         setRelocatingPointId(null);
       },
       relocatingPointId,
       beginRelocate(id) {
+        if (readOnly) return;
         setRelocatingPointId((cur) => (cur === id ? null : id));
       },
       cancelRelocate() {
         setRelocatingPointId(null);
       },
       setPointReview(id, review) {
+        if (readOnly) return;
         setPoints((prev) => prev.map((p) => (p.id === id ? { ...p, review } : p)));
       },
       deletePoint(id) {
+        if (readOnly) return;
         setPoints((prev) => prev.filter((p) => p.id !== id));
         setPlacements((prev) =>
           prev.map((p) => (p.atPointId === id ? { ...p, atPointId: "", destination: p.destination } : p)),
@@ -176,9 +222,11 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         setRelocatingPointId((cur) => (cur === id ? null : cur));
       },
       updateResource(resourceId, patch) {
+        if (readOnly) return;
         setResources((prev) => prev.map((r) => (r.id === resourceId ? { ...r, ...patch, id: r.id } : r)));
       },
       addResource() {
+        if (readOnly) return;
         const id = `r-${crypto.randomUUID()}`;
         const n = resources.length + 1;
         const home = points.find((p) => p.review === "accepted");
@@ -205,11 +253,13 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         ]);
       },
       removeResources(ids) {
+        if (readOnly) return;
         const drop = new Set(ids);
         setResources((prev) => prev.filter((r) => !drop.has(r.id)));
         setPlacements((prev) => prev.filter((p) => !drop.has(p.resourceId)));
       },
       reorderResources(fromId, toId) {
+        if (readOnly) return;
         if (fromId === toId) return;
         setResources((prev) => {
           const from = prev.findIndex((r) => r.id === fromId);
@@ -222,6 +272,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         });
       },
       setDestination(resourceId, raw) {
+        if (readOnly) return;
         setPlacements((prev) =>
           prev.map((p) => {
             if (p.resourceId !== resourceId) return p;
@@ -241,6 +292,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         );
       },
       markArrival(resourceId) {
+        if (readOnly) return;
         setPlacements((prev) =>
           prev.map((p) => {
             if (p.resourceId !== resourceId) return p;
@@ -257,6 +309,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         );
       },
       dropOnClosest(resourceId, lat, lon) {
+        if (readOnly) return;
         const match = closestAccepted(points, lat, lon);
         if (!match) return;
         setPlacements((prev) =>
@@ -274,6 +327,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         );
       },
       setDuty(resourceId, duty) {
+        if (readOnly) return;
         setPlacements((prev) =>
           prev.map((p) => {
             if (p.resourceId !== resourceId) return p;
@@ -287,26 +341,30 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         );
       },
       setEmergencyCare(resourceId, on) {
+        if (readOnly) return;
         setPlacements((prev) => prev.map((p) => (p.resourceId === resourceId ? { ...p, emergencyCare: on } : p)));
       },
       boardNotice,
       saveBoard() {
+        if (readOnly) return;
         const ok = writeStoredBoard({ points, resources, placements });
         setBoardNotice(ok ? "Saved snap points and units in this browser." : "Could not save in this browser.");
       },
       replacePoints(next) {
+        if (readOnly) return;
         setPoints(sortedByLabel(next));
         setPlacements((prev) => dockedToKnownPoints(prev, next));
         setRelocatingPointId(null);
         setBoardNotice(`Imported ${next.length} snap point${next.length === 1 ? "" : "s"}.`);
       },
       replaceUnits(nextResources, nextPlacements) {
+        if (readOnly) return;
         setResources(nextResources);
         setPlacements(dockedToKnownPoints(nextPlacements, points));
         setBoardNotice(`Imported ${nextResources.length} unit${nextResources.length === 1 ? "" : "s"}.`);
       },
     }),
-    [points, resources, placements, overlay, pdfError, pdfBusy, boardNotice, relocatingPointId],
+    [points, resources, placements, overlay, pdfError, pdfBusy, boardNotice, relocatingPointId, readOnly],
   );
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;

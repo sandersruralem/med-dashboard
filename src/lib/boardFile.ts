@@ -1,5 +1,6 @@
 import type {
   Capability,
+  BoardSnapshot,
   DutyStatus,
   MapPoint,
   MapPointCategory,
@@ -9,6 +10,8 @@ import type {
   ResourcePlacement,
   ReviewStatus,
 } from "../types";
+
+export type { BoardSnapshot } from "../types";
 
 export const SNAP_FORMAT = "wildfire-med-snap-points";
 export const UNITS_FORMAT = "wildfire-med-units";
@@ -35,12 +38,6 @@ const DUTIES = new Set<DutyStatus>(["at_location", "on_scene", "enroute", "retur
 const MOVEMENTS = new Set<MovementState>(["at_icp_camp", "en_route", "at_other", "moving", "returning"]);
 const REVIEWS = new Set<ReviewStatus>(["pending", "accepted", "rejected"]);
 const SOURCES = new Set<MapPoint["source"]>(["geopdf_extract", "manual"]);
-
-export interface BoardSnapshot {
-  points: MapPoint[];
-  resources: MedicalResource[];
-  placements: ResourcePlacement[];
-}
 
 export type ParsedImport =
   | { ok: true; kind: "points"; points: MapPoint[] }

@@ -3,13 +3,17 @@ import { PointReview } from "./components/PointReview";
 import { ResourceTable } from "./components/ResourceTable";
 import { StoreProvider } from "./store";
 import { useCallback, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
+import { LiveRoomProvider, useLiveRoom } from "./live";
+import { useStore } from "./store";
 
 const MIN = 32;
 const MAX = 78;
 
-export function App() {
+function BoardApp() {
   const [mapPct, setMapPct] = useState(67);
   const workspaceRef = useRef<HTMLDivElement>(null);
+  const { readOnly } = useStore();
+  const { roomId, role, status, message, shareBoard, copyViewerLink } = useLiveRoom();
 
   const onSplitPointerDown = useCallback((e: ReactPointerEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -37,12 +41,36 @@ export function App() {
   }, []);
 
   return (
-    <StoreProvider>
-      <div className="app">
+    <div className="app">
         <header className="app-bar">
-          <p className="eyebrow">Wildfire medical tracker</p>
-          <h1>Resource board</h1>
+          <div>
+            <p className="eyebrow">Wildfire medical tracker</p>
+            <h1>Resource board</h1>
+          </div>
+          <div className="live-controls">
+            {!readOnly ? (
+              <button type="button" className="btn" onClick={() => void shareBoard()}>
+                Share board
+              </button>
+            ) : null}
+            {roomId ? (
+              <button type="button" className="btn" onClick={() => void copyViewerLink()}>
+                Copy viewer link
+              </button>
+            ) : null}
+            <span className={`live-status ${status}`}>
+              {status === "local"
+                ? "Local"
+                : status === "connected"
+                  ? `Live · ${role ?? "connected"}`
+                  : status === "connecting"
+                    ? "Live · connecting"
+                    : "Live · disconnected"}
+            </span>
+            {message ? <span className="live-message">{message}</span> : null}
+          </div>
         </header>
+        {readOnly ? <div className="read-only-banner">Live view — read only</div> : null}
         <div
           ref={workspaceRef}
           className="workspace"
@@ -64,7 +92,16 @@ export function App() {
             <ResourceTable />
           </aside>
         </div>
-      </div>
+    </div>
+  );
+}
+
+export function App() {
+  return (
+    <StoreProvider>
+      <LiveRoomProvider>
+        <BoardApp />
+      </LiveRoomProvider>
     </StoreProvider>
   );
 }

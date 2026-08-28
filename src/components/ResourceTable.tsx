@@ -44,6 +44,7 @@ export function ResourceTable() {
     saveBoard,
     replaceUnits,
     reorderResources,
+    readOnly,
   } = useStore();
   const [removing, setRemoving] = useState(false);
   const [colsOpen, setColsOpen] = useState(false);
@@ -88,21 +89,28 @@ export function ResourceTable() {
             onSave={saveBoard}
             onExport={() => downloadJson(stampFilename("units"), unitsPayload(resources, placements))}
             onImportText={importUnits}
+            readOnly={readOnly}
           />
-          <button type="button" className="btn tiny" onClick={addResource}>
-            Add resource
-          </button>
-          <button type="button" className="btn tiny danger" onClick={() => setRemoving(true)}>
-            Remove units
-          </button>
+          {!readOnly ? (
+            <>
+              <button type="button" className="btn tiny" onClick={addResource}>
+                Add resource
+              </button>
+              <button type="button" className="btn tiny danger" onClick={() => setRemoving(true)}>
+                Remove units
+              </button>
+            </>
+          ) : null}
           <span className="count">{resources.length}</span>
         </div>
       </header>
       {boardNotice ? <p className="hint pad">{boardNotice}</p> : null}
-      <p className="hint pad">
-        Edit any cell. Drag the handle on the left to reorder units. Location lists known points, or accepts a custom
-        name.
-      </p>
+      {!readOnly ? (
+        <p className="hint pad">
+          Edit any cell. Drag the handle on the left to reorder units. Location lists known points, or accepts a custom
+          name.
+        </p>
+      ) : null}
       <div className="legend">
         <span className="swatch blue">At location</span>
         <span className="swatch yellow">En route</span>
@@ -140,7 +148,7 @@ export function ResourceTable() {
                 <tr
                   key={r.id}
                   className={`row-${tone}${isInTransit(place) ? " pulse" : ""}${dragClass}`}
-                  draggable={dragId === r.id}
+                  draggable={!readOnly && dragId === r.id}
                   onDragStart={(e) => {
                     e.dataTransfer.effectAllowed = "move";
                     e.dataTransfer.setData("text/plain", r.id);
@@ -166,6 +174,7 @@ export function ResourceTable() {
                     <button
                       type="button"
                       className="grip"
+                      disabled={readOnly}
                       aria-label={`Reorder ${r.fireName || "unit"}. Use alt with arrow up or down.`}
                       onPointerDown={() => setDragId(r.id)}
                       onPointerUp={() => setDragId((cur) => (cur === r.id ? null : cur))}
@@ -190,6 +199,7 @@ export function ResourceTable() {
                       <input
                         className="field cell"
                         value={r.vendor}
+                        disabled={readOnly}
                         onChange={(e) => updateResource(r.id, { vendor: e.target.value })}
                         aria-label={`Vendor for ${r.fireName}`}
                       />
@@ -200,6 +210,7 @@ export function ResourceTable() {
                       <input
                         className="field cell name"
                         value={r.fireName}
+                        disabled={readOnly}
                         onChange={(e) => updateResource(r.id, { fireName: e.target.value })}
                         aria-label="Fire-specific name"
                       />
@@ -210,6 +221,7 @@ export function ResourceTable() {
                       <select
                         className="field cell kind-select"
                         value={r.kind}
+                        disabled={readOnly}
                         onChange={(e) => updateResource(r.id, { kind: e.target.value as MarkerKind })}
                         aria-label={`Type for ${r.fireName}`}
                       >
@@ -224,6 +236,7 @@ export function ResourceTable() {
                       <input
                         className="field cell"
                         value={r.leaderName}
+                        disabled={readOnly}
                         onChange={(e) => updateResource(r.id, { leaderName: e.target.value })}
                         aria-label={`Leader for ${r.fireName}`}
                       />
@@ -234,6 +247,7 @@ export function ResourceTable() {
                       <input
                         className="field cell"
                         value={r.leaderPhone}
+                        disabled={readOnly}
                         onChange={(e) => updateResource(r.id, { leaderPhone: e.target.value })}
                         aria-label={`Phone for ${r.fireName}`}
                       />
@@ -244,6 +258,7 @@ export function ResourceTable() {
                       <select
                         className="field cell cap-select"
                         value={r.capability}
+                        disabled={readOnly}
                         onChange={(e) => updateResource(r.id, { capability: e.target.value as Capability })}
                         aria-label={`Capability for ${r.fireName}`}
                       >
@@ -259,6 +274,7 @@ export function ResourceTable() {
                         options={locationOptions}
                         onChange={(next) => setDestination(r.id, next)}
                         ariaLabel={`Location for ${r.fireName}`}
+                        disabled={readOnly}
                       />
                     </td>
                   ) : null}
@@ -267,6 +283,7 @@ export function ResourceTable() {
                       <select
                         className="field cell status-select"
                         value={place.duty}
+                        disabled={readOnly}
                         onChange={(e) => setDuty(r.id, e.target.value as DutyStatus)}
                         aria-label={`Status for ${r.fireName}`}
                       >
@@ -279,7 +296,7 @@ export function ResourceTable() {
                   ) : null}
                   {visibility.actions ? (
                     <td className="actions">
-                      {isInTransit(place) ? (
+                      {!readOnly && isInTransit(place) ? (
                         <button type="button" className="btn cell-action" onClick={() => markArrival(r.id)}>
                           Arrive
                         </button>
@@ -287,6 +304,7 @@ export function ResourceTable() {
                       <button
                         type="button"
                         className={`btn cell-action${place.emergencyCare ? " danger on" : ""}`}
+                        disabled={readOnly}
                         aria-pressed={place.emergencyCare}
                         title="Unit assigned to an IWI. No patient details."
                         onClick={() => setEmergencyCare(r.id, !place.emergencyCare)}

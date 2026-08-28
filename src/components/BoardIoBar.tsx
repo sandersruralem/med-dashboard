@@ -8,6 +8,7 @@ interface Props {
   onSave: () => void;
   onExport: () => void;
   onImportText: (text: string) => string | void;
+  readOnly?: boolean;
 }
 
 export function BoardIoBar({
@@ -18,6 +19,7 @@ export function BoardIoBar({
   onSave,
   onExport,
   onImportText,
+  readOnly = false,
 }: Props) {
   const fileRef = useRef<HTMLInputElement>(null);
   const confirmRef = useRef<HTMLDialogElement>(null);
@@ -52,15 +54,19 @@ export function BoardIoBar({
 
   return (
     <div className="io-bar">
-      <button type="button" className="btn tiny" onClick={onSave}>
-        Save
-      </button>
+      {!readOnly ? (
+        <button type="button" className="btn tiny" onClick={onSave}>
+          Save
+        </button>
+      ) : null}
       <button type="button" className="btn tiny" onClick={onExport}>
         {exportLabel}
       </button>
-      <button type="button" className="btn tiny" onClick={pickFile}>
-        {importLabel}
-      </button>
+      {!readOnly ? (
+        <button type="button" className="btn tiny" onClick={pickFile}>
+          {importLabel}
+        </button>
+      ) : null}
       <input
         ref={fileRef}
         className="hidden-file"
