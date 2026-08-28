@@ -22,7 +22,7 @@ It is a **location and movement board** for one editor and optional read-only vi
 ## Shift handoff
 
 1. **Save** in the editor browser.
-2. **Export** units and snap points; leave files where the incoming RADO can find them.
+2. **Export** units and map points; leave files where the incoming RADO can find them.
 3. Brief: which GeoPDF, any disputed snap labels, units still en route (yellow), any Emergency (red) toggles still on.
 4. If live share must continue: keep the **same editor browser/session** open, or start a **new Share board** after the incoming operator restores/imports on their editor window. Closing the editor does not promote a viewer.
 5. LAN USB folder: closing the console or `Start-MedBoard.cmd` stops the server. Tell viewers the live feed will end; they retain the last snapshot already received.

@@ -1,6 +1,6 @@
 # 2. Map and snap points
 
-Snap points are the incident locations the unit table and markers attach to. Prefer a **correct, reviewable list** over a silent bad extract.
+**Map points** (the pane on the board) are the incident locations the unit table and markers attach to. Prefer a **correct, reviewable list** over a silent bad extract. The pane starts **collapsed** — click **Map points** to open it.
 
 Categories follow [NWCG PMS 910](https://www.nwcg.gov/publications/pms910/nwcg-data-standards-pms-910) Event Point / Helispots naming and [PMS 936](https://www.nwcg.gov/publications/pms936/nwcg-standards-for-geospatial-operations-pms-936) point symbology. Do **not** invent new Event Point types in the field.
 
@@ -24,7 +24,7 @@ Import is **GeoPDF only**. There is no Event GDB, shapefile, GeoJSON sidecar, NI
 
 ## Review the point list
 
-Use the snap list controls so only trustworthy points become snap targets:
+Use the Map points controls so only trustworthy points become snap targets:
 
 - **Accept** — point may be used for location / closest-point dock
 - **Reject** — keep it out of snap targets
@@ -46,7 +46,7 @@ The list sorts A–Z with numeric awareness (DP-2 before DP-10).
 When Planning drops a new ops map:
 
 1. Load the new GeoPDF (**Add PDF** on the map).
-2. Re-review snap points for that product.
+2. Re-review Map points for that product.
 3. Resource placements stay in WGS84; update the map and points, do not wipe the unit table unless Import replaces units on purpose.
 
 If **Share board** is already live, Add PDF replaces the room map. Viewers reload the new GeoPDF without a refresh; units stay on the board.

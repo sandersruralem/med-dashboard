@@ -68,7 +68,7 @@ Use the HTTPS Pages origin **https://med-dashboard-8ov.pages.dev/**, not `localh
 - Anyone with the viewer URL can read the board, including leader contact fields. Treat it like the exported unit JSON.
 - Closing the editor tab ends that editor session; the room keeps its last snapshot for viewers. Start a new shared room from the RADO’s locally saved board if needed.
 - Keep using Save/Export as the WAN-loss fallback. Viewers retain the last snapshot they received while disconnected.
-- The room syncs snap points, units, placements, and the editor’s GeoPDF (bundled High Lava is a hash shortcut; a custom Add PDF is uploaded to the room, max 20 MB). Anyone with the Share link can read that map. Leader names and phones still must not go in the URL.
+- The room syncs map points, units, placements, and the editor’s GeoPDF (bundled High Lava is a hash shortcut; a custom Add PDF is uploaded to the room, max 20 MB). Anyone with the Share link can read that map. Leader names and phones still must not go in the URL.
 
 ## LAN USB folder (ICP laptop)
 
@@ -81,7 +81,7 @@ cd C:\Cursor\Med_dashboard
 npm.cmd run portable:pack
 ```
 
-Field download: the versioned zip on the [GitHub Releases](https://github.com/sandersruralem/med-dashboard/releases) page (v2.1.0 is `MedBoard-LAN-2.1.0-portable.zip`). Or unzip `release/MedBoard-LAN-portable.zip` after a local pack. Copy the whole `MedBoard-LAN` folder to a USB stick. On the ICP laptop:
+Field download: the versioned zip on the [GitHub Releases](https://github.com/sandersruralem/med-dashboard/releases) page (v2.1.1 is `MedBoard-LAN-2.1.1-portable.zip`). Or unzip `release/MedBoard-LAN-portable.zip` after a local pack. Copy the whole `MedBoard-LAN` folder to a USB stick. On the ICP laptop:
 
 1. If the agency blocks running from removable media, copy the folder to the Desktop first.
 2. Double-click `Start-MedBoard.cmd`. Leave the console window open.
@@ -92,7 +92,7 @@ Field download: the versioned zip on the [GitHub Releases](https://github.com/sa
 
 First run: allow **private** network for `node.exe`, inbound TCP **8787–8796**. If an agency allowlists publishers, they must allow **OpenJS Foundation / Node.js**.
 
-Do not put an editor key, incident name, leader name, or phone number in the folder name, `.cmd`, zip name, or copied URL. Share board also sends the editor’s GeoPDF to LAN viewers (same 20 MB cap). The v2.1.0 USB zip is the field artifact that includes that path.
+Do not put an editor key, incident name, leader name, or phone number in the folder name, `.cmd`, zip name, or copied URL. Share board also sends the editor’s GeoPDF to LAN viewers (same 20 MB cap). The v2.1.1 USB zip is the field artifact that includes that path.
 
 ### This development PC
 

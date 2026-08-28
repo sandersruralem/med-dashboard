@@ -1,9 +1,9 @@
 import { IncidentMap } from "./components/IncidentMap";
-import { PointReview } from "./components/PointReview";
+import { PointReview, loadMapPointsOpen, saveMapPointsOpen } from "./components/PointReview";
 import { ResourceTable } from "./components/ResourceTable";
 import { ShareViewerDialog } from "./components/ShareViewerDialog";
 import { StoreProvider } from "./store";
-import { useCallback, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
+import { useCallback, useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
 import { LiveRoomProvider, useLiveRoom } from "./live";
 import { useStore } from "./store";
 
@@ -15,6 +15,7 @@ const SNAP_MAX = 70;
 function BoardApp() {
   const [mapPct, setMapPct] = useState(67);
   const [snapPct, setSnapPct] = useState(32);
+  const [mapPointsOpen, setMapPointsOpen] = useState(loadMapPointsOpen);
   const workspaceRef = useRef<HTMLDivElement>(null);
   const tableRef = useRef<HTMLElement>(null);
   const { readOnly } = useStore();
@@ -67,10 +68,14 @@ function BoardApp() {
     handle.addEventListener("pointerup", onUp);
   }, []);
 
+  useEffect(() => {
+    saveMapPointsOpen(mapPointsOpen);
+  }, [mapPointsOpen]);
+
   return (
     <div className="app">
         <header className="app-bar">
-          <div>
+          <div className="app-bar-titles">
             <p className="eyebrow">Wildfire medical tracker</p>
             <h1>Resource board</h1>
           </div>
@@ -128,17 +133,19 @@ function BoardApp() {
             className="table-pane"
             style={{ ["--snap-pct" as string]: `${snapPct}%` }}
           >
-            <PointReview />
-            <button
-              type="button"
-              className="table-split"
-              aria-label="Resize snap points and units"
-              aria-orientation="horizontal"
-              aria-valuemin={SNAP_MIN}
-              aria-valuemax={SNAP_MAX}
-              aria-valuenow={Math.round(snapPct)}
-              onPointerDown={onTableSplitPointerDown}
-            />
+            <PointReview open={mapPointsOpen} onOpenChange={setMapPointsOpen} />
+            {mapPointsOpen ? (
+              <button
+                type="button"
+                className="table-split"
+                aria-label="Resize map points and units"
+                aria-orientation="horizontal"
+                aria-valuemin={SNAP_MIN}
+                aria-valuemax={SNAP_MAX}
+                aria-valuenow={Math.round(snapPct)}
+                onPointerDown={onTableSplitPointerDown}
+              />
+            ) : null}
             <ResourceTable />
           </aside>
         </div>

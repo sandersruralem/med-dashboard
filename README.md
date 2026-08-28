@@ -15,11 +15,11 @@ This is a **location and movement board** (typically 5–50 resources). It is no
 
 ## What you get
 
-- GeoPDF basemap with reviewable snap points (Drop Point, Junction, Helispot, Unimproved Helispot, Helibase, ICP, Camp, Staging, Safety Zone, Lookout, Incident Base)
+- GeoPDF basemap with reviewable map points (Drop Point, Junction, Helispot, Unimproved Helispot, Helibase, ICP, Camp, Staging, Safety Zone, Lookout, Incident Base)
 - Unit markers (ambulance, firefighter/EMT, REMS) that **stay at source while en route** and move on **Arrive** or map drop
 - Movement colors: blue (ICP/camp), yellow pulse (en route), green (arrived elsewhere), red (emergency/care — manual)
 - Capability **ALS / BLS** only
-- Save / Export / Import for snap points and units; optional live Share board (no leader name or phone in the URL)
+- Save / Export / Import for map points and units; optional live Share board (no leader name or phone in the URL)
 - Share board also sends the editor’s GeoPDF (bundled High Lava, or a file they added, max 20 MB)
 
 ## Run simply (field)

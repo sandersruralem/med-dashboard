@@ -1,8 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type CSSProperties, type PointerEvent as ReactPointerEvent } from "react";
 import { downloadJson, parseImportedJson, stampFilename, unitsPayload } from "../lib/boardFile";
 import {
+  clampColumnWidth,
   loadColumnVisibility,
+  loadColumnWidths,
   saveColumnVisibility,
+  saveColumnWidths,
   toggleColumn,
   type UnitColumnId,
 } from "../lib/columns";
@@ -13,9 +16,44 @@ import { LocationCombobox } from "./LocationCombobox";
 import { RemoveUnitsDialog } from "./RemoveUnitsDialog";
 import { useStore } from "../store";
 
-function ColumnHead({ label, onOpen }: { label: string; onOpen: () => void }) {
+function colStyle(width: number): CSSProperties {
+  return { width, minWidth: width, maxWidth: width };
+}
+
+function ColumnHead({
+  id,
+  label,
+  width,
+  onOpen,
+  onResize,
+}: {
+  id: UnitColumnId;
+  label: string;
+  width: number;
+  onOpen: () => void;
+  onResize: (id: UnitColumnId, width: number) => void;
+}) {
+  function onResizePointerDown(e: ReactPointerEvent<HTMLButtonElement>) {
+    e.preventDefault();
+    e.stopPropagation();
+    const handle = e.currentTarget;
+    handle.setPointerCapture(e.pointerId);
+    const startX = e.clientX;
+    const startW = width;
+
+    const onMove = (ev: PointerEvent) => {
+      onResize(id, clampColumnWidth(startW + (ev.clientX - startX)));
+    };
+    const onUp = () => {
+      handle.removeEventListener("pointermove", onMove);
+      handle.removeEventListener("pointerup", onUp);
+    };
+    handle.addEventListener("pointermove", onMove);
+    handle.addEventListener("pointerup", onUp);
+  }
+
   return (
-    <th>
+    <th style={colStyle(width)}>
       <span className="th-inner">
         <span>{label}</span>
         <button type="button" className="kebab" aria-label={`Show or hide columns from ${label}`} onClick={onOpen}>
@@ -23,6 +61,7 @@ function ColumnHead({ label, onOpen }: { label: string; onOpen: () => void }) {
           <span />
           <span />
         </button>
+        <button type="button" className="col-resize" aria-label={`Resize ${label} column`} onPointerDown={onResizePointerDown} />
       </span>
     </th>
   );
@@ -49,6 +88,7 @@ export function ResourceTable() {
   const [removing, setRemoving] = useState(false);
   const [colsOpen, setColsOpen] = useState(false);
   const [visibility, setVisibility] = useState(loadColumnVisibility);
+  const [widths, setWidths] = useState(loadColumnWidths);
   const [dragId, setDragId] = useState<string | null>(null);
   const [overId, setOverId] = useState<string | null>(null);
   const locationOptions = points.filter((p) => p.review === "accepted").map((p) => p.label);
@@ -56,6 +96,10 @@ export function ResourceTable() {
   useEffect(() => {
     saveColumnVisibility(visibility);
   }, [visibility]);
+
+  useEffect(() => {
+    saveColumnWidths(widths);
+  }, [widths]);
 
   function onToggle(id: UnitColumnId) {
     setVisibility((prev) => toggleColumn(prev, id));
@@ -71,7 +115,7 @@ export function ResourceTable() {
   function importUnits(text: string) {
     const parsed = parseImportedJson(text);
     if (!parsed.ok) return parsed.message;
-    if (parsed.kind === "points") return "That file is snap points. Use Import points on the snap list.";
+    if (parsed.kind === "points") return "That file is map points. Use Import on the map list.";
     const bundle = parsed.kind === "board" ? parsed.snapshot : parsed;
     replaceUnits(bundle.resources, bundle.placements);
   }
@@ -85,7 +129,7 @@ export function ResourceTable() {
             exportLabel="Export"
             importLabel="Import"
             confirmTitle="Replace units?"
-            confirmBody="This replaces the unit table (and dock positions) from the file. Snap points stay as they are. Leader names and phones are in the file — keep it off shared drives if that matters."
+            confirmBody="This replaces the unit table (and dock positions) from the file. Map points stay as they are. Leader names and phones are in the file — keep it off shared drives if that matters."
             onSave={saveBoard}
             onExport={() => downloadJson(stampFilename("units"), unitsPayload(resources, placements))}
             onImportText={importUnits}
@@ -119,21 +163,39 @@ export function ResourceTable() {
         <span className="swatch red">IWI / emergency</span>
       </div>
       <div className="table-wrap">
-        <table>
+        <table className="unit-table">
           <thead>
             <tr>
               <th className="grip-head">
                 <span className="sr-only">Reorder</span>
               </th>
-              {visibility.vendor ? <ColumnHead label="Vendor / org" onOpen={() => setColsOpen(true)} /> : null}
-              {visibility.fireName ? <ColumnHead label="Fire name" onOpen={() => setColsOpen(true)} /> : null}
-              {visibility.kind ? <ColumnHead label="Type" onOpen={() => setColsOpen(true)} /> : null}
-              {visibility.leaderName ? <ColumnHead label="Leader" onOpen={() => setColsOpen(true)} /> : null}
-              {visibility.leaderPhone ? <ColumnHead label="Phone" onOpen={() => setColsOpen(true)} /> : null}
-              {visibility.capability ? <ColumnHead label="ALS/BLS" onOpen={() => setColsOpen(true)} /> : null}
-              {visibility.location ? <ColumnHead label="Location" onOpen={() => setColsOpen(true)} /> : null}
-              {visibility.status ? <ColumnHead label="Status" onOpen={() => setColsOpen(true)} /> : null}
-              {visibility.actions ? <ColumnHead label="Actions" onOpen={() => setColsOpen(true)} /> : null}
+              {visibility.vendor ? (
+                <ColumnHead id="vendor" label="Vendor / org" width={widths.vendor} onOpen={() => setColsOpen(true)} onResize={(id, w) => setWidths((prev) => ({ ...prev, [id]: w }))} />
+              ) : null}
+              {visibility.fireName ? (
+                <ColumnHead id="fireName" label="Fire name" width={widths.fireName} onOpen={() => setColsOpen(true)} onResize={(id, w) => setWidths((prev) => ({ ...prev, [id]: w }))} />
+              ) : null}
+              {visibility.kind ? (
+                <ColumnHead id="kind" label="Type" width={widths.kind} onOpen={() => setColsOpen(true)} onResize={(id, w) => setWidths((prev) => ({ ...prev, [id]: w }))} />
+              ) : null}
+              {visibility.leaderName ? (
+                <ColumnHead id="leaderName" label="Leader" width={widths.leaderName} onOpen={() => setColsOpen(true)} onResize={(id, w) => setWidths((prev) => ({ ...prev, [id]: w }))} />
+              ) : null}
+              {visibility.leaderPhone ? (
+                <ColumnHead id="leaderPhone" label="Phone" width={widths.leaderPhone} onOpen={() => setColsOpen(true)} onResize={(id, w) => setWidths((prev) => ({ ...prev, [id]: w }))} />
+              ) : null}
+              {visibility.capability ? (
+                <ColumnHead id="capability" label="ALS/BLS" width={widths.capability} onOpen={() => setColsOpen(true)} onResize={(id, w) => setWidths((prev) => ({ ...prev, [id]: w }))} />
+              ) : null}
+              {visibility.location ? (
+                <ColumnHead id="location" label="Location" width={widths.location} onOpen={() => setColsOpen(true)} onResize={(id, w) => setWidths((prev) => ({ ...prev, [id]: w }))} />
+              ) : null}
+              {visibility.status ? (
+                <ColumnHead id="status" label="Status" width={widths.status} onOpen={() => setColsOpen(true)} onResize={(id, w) => setWidths((prev) => ({ ...prev, [id]: w }))} />
+              ) : null}
+              {visibility.actions ? (
+                <ColumnHead id="actions" label="Actions" width={widths.actions} onOpen={() => setColsOpen(true)} onResize={(id, w) => setWidths((prev) => ({ ...prev, [id]: w }))} />
+              ) : null}
             </tr>
           </thead>
           <tbody>
@@ -195,7 +257,7 @@ export function ResourceTable() {
                     </button>
                   </td>
                   {visibility.vendor ? (
-                    <td>
+                    <td style={colStyle(widths.vendor)}>
                       <input
                         className="field cell"
                         value={r.vendor}
@@ -206,7 +268,7 @@ export function ResourceTable() {
                     </td>
                   ) : null}
                   {visibility.fireName ? (
-                    <td>
+                    <td style={colStyle(widths.fireName)}>
                       <input
                         className="field cell name"
                         value={r.fireName}
@@ -217,7 +279,7 @@ export function ResourceTable() {
                     </td>
                   ) : null}
                   {visibility.kind ? (
-                    <td>
+                    <td style={colStyle(widths.kind)}>
                       <select
                         className="field cell kind-select"
                         value={r.kind}
@@ -232,7 +294,7 @@ export function ResourceTable() {
                     </td>
                   ) : null}
                   {visibility.leaderName ? (
-                    <td>
+                    <td style={colStyle(widths.leaderName)}>
                       <input
                         className="field cell"
                         value={r.leaderName}
@@ -243,7 +305,7 @@ export function ResourceTable() {
                     </td>
                   ) : null}
                   {visibility.leaderPhone ? (
-                    <td>
+                    <td style={colStyle(widths.leaderPhone)}>
                       <input
                         className="field cell"
                         value={r.leaderPhone}
@@ -254,7 +316,7 @@ export function ResourceTable() {
                     </td>
                   ) : null}
                   {visibility.capability ? (
-                    <td>
+                    <td style={colStyle(widths.capability)}>
                       <select
                         className="field cell cap-select"
                         value={r.capability}
@@ -268,7 +330,7 @@ export function ResourceTable() {
                     </td>
                   ) : null}
                   {visibility.location ? (
-                    <td>
+                    <td style={colStyle(widths.location)}>
                       <LocationCombobox
                         value={locationValue}
                         options={locationOptions}
@@ -279,7 +341,7 @@ export function ResourceTable() {
                     </td>
                   ) : null}
                   {visibility.status ? (
-                    <td>
+                    <td style={colStyle(widths.status)}>
                       <select
                         className="field cell status-select"
                         value={place.duty}
@@ -295,7 +357,7 @@ export function ResourceTable() {
                     </td>
                   ) : null}
                   {visibility.actions ? (
-                    <td className="actions">
+                    <td className="actions" style={colStyle(widths.actions)}>
                       {!readOnly && isInTransit(place) ? (
                         <button type="button" className="btn cell-action" onClick={() => markArrival(r.id)}>
                           Arrive

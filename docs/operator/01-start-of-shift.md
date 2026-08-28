@@ -6,7 +6,7 @@ Goal: one editor keyboard at ICP, a north-up map with the current ops GeoPDF, an
 
 - Confirm you are the **editor** for this shift (one RADO). Viewers do not get edit rights if you disconnect.
 - Know whether you are using the **LAN USB folder** (`Start-MedBoard.cmd`) or the **hosted** HTTPS board. Do not mix an editor session from localhost with viewers on a different origin.
-- Have yesterday’s **Export** JSON (units and/or snap points) on hand if this browser or laptop is new.
+- Have yesterday’s **Export** JSON (units and/or map points) on hand if this browser or laptop is new.
 
 ## Boot (LAN at ICP)
 
@@ -23,15 +23,15 @@ Goal: one editor keyboard at ICP, a north-up map with the current ops GeoPDF, an
 
 ## Restore or import
 
-- Same browser as last shift: the board may show **Restored the last saved board in this browser.** Review units and snap points before trusting it.
-- New machine or empty board: use **Import** on the Units header and/or snap list with the JSON you exported last shift.
+- Same browser as last shift: the board may show **Restored the last saved board in this browser.** Review units and Map points before trusting it.
+- New machine or empty board: use **Import** on the Units header and/or Map points with the JSON you exported last shift.
 - Prefer a known-good Export over rebuilding the whole table from memory under radio load.
 
 ## Confirm the map
 
 1. Confirm the GeoPDF basemap is the current ops product (bundled sample or load the incident PDF).
 2. Zoom/pan only — the map stays **true north** (no rotation).
-3. Open the snap list: accepted points are what the table and markers snap to. Fix labels before you start moving units (chapter 2).
+3. Open **Map points**: accepted points are what the table and markers snap to. Fix labels before you start moving units (chapter 2).
 
 ## Confirm the unit table
 
@@ -43,7 +43,7 @@ Goal: one editor keyboard at ICP, a north-up map with the current ops GeoPDF, an
 
 - [ ] Editor window open; you are not on a viewer-only link
 - [ ] Map shows the right GeoPDF and north is up
-- [ ] Snap points reviewed enough to trust DP / H / ICP labels
+- [ ] Map points reviewed enough to trust DP / H / ICP labels
 - [ ] Units list matches check-in (or last Export)
 - [ ] **Share board** only when MEDL/SITL need the live view (chapter 4)
 

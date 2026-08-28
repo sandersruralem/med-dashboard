@@ -285,7 +285,7 @@ export function IncidentMap() {
             icon={snapIcon(pt.id === relocatingPointId)}
             eventHandlers={{ dragend: (e) => onSnapDragEnd(pt.id, e as DragEndEvent) }}
           >
-            <Popup>{readOnly ? pt.label : `${pt.label} — drag or use Move in the snap list`}</Popup>
+            <Popup>{readOnly ? pt.label : `${pt.label} — drag or use Move in the map list`}</Popup>
           </Marker>
         ))}
         {resources.map((r) => {

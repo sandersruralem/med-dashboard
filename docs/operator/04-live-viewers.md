@@ -1,6 +1,6 @@
 # 4. Live viewers
 
-**Share board** gives MEDL, SITL, and others a live read-only copy of snap points, units, placements, and the **same GeoPDF** the editor is using (bundled High Lava or a PDF they added). Viewers tile that file locally. Anyone with the link can read the ops map.
+**Share board** gives MEDL, SITL, and others a live read-only copy of map points, units, placements, and the **same GeoPDF** the editor is using (bundled High Lava or a PDF they added). Viewers tile that file locally. Anyone with the link can read the ops map.
 
 ## Editor vs viewer
 

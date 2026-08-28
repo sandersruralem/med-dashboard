@@ -33,7 +33,7 @@ Leader name and phone are personnel contact fields — not patient PHI — but s
   - `jct4` → JCT-4
   - “the ICP” / `icp` → ICP
 - **Typing a destination does not move the map marker** while the unit is in transit. The marker stays at the **source** until **Arrive** (or you drop the marker on the map).
-- Dragging a marker to the map docks to the closest accepted snap point and updates location.
+- Dragging a marker to the map docks to the closest accepted map point and updates location.
 
 ## Movement colors (locked)
 

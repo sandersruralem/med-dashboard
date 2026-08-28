@@ -386,14 +386,14 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       saveBoard() {
         if (readOnly) return;
         const ok = writeStoredBoard({ points, resources, placements });
-        setBoardNotice(ok ? "Saved snap points and units in this browser." : "Could not save in this browser.");
+        setBoardNotice(ok ? "Saved map points and units in this browser." : "Could not save in this browser.");
       },
       replacePoints(next) {
         if (readOnly) return;
         setPoints(sortedByLabel(next));
         setPlacements((prev) => dockedToKnownPoints(prev, next));
         setRelocatingPointId(null);
-        setBoardNotice(`Imported ${next.length} snap point${next.length === 1 ? "" : "s"}.`);
+        setBoardNotice(`Imported ${next.length} map point${next.length === 1 ? "" : "s"}.`);
       },
       replaceUnits(nextResources, nextPlacements) {
         if (readOnly) return;

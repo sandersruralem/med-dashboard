@@ -4,9 +4,9 @@ Live Share board is convenience. **Save** and **Export** are how you survive a c
 
 ## Save (this browser)
 
-- **Save** writes snap points and units into this browser’s storage (origin-scoped).
+- **Save** writes map points and units into this browser’s storage (origin-scoped).
 - Hosted Pages and the LAN USB folder do **not** share the same storage — Export if you move machines.
-- Success notice: snap points and units saved in this browser.
+- Success notice: map points and units saved in this browser.
 
 ## Export
 
@@ -14,21 +14,21 @@ Use the section actions:
 
 | Control | File contents |
 | --- | --- |
-| Snap list **Export** | Accepted / reviewed snap points JSON |
+| Map points **Export** | Accepted / reviewed map points JSON |
 | Units **Export** | Unit rows and dock placements JSON |
 
 Filenames are time-stamped. Leader names and phones are in the units file — keep it off casual shared drives if that matters.
 
 ## Import
 
-- **Import** on the snap list replaces / loads snap points. A units file offered here will be rejected with a pointer to Units Import.
-- **Import** on Units replaces the unit table and dock positions; snap points stay as they are unless you import a full board bundle that the parser accepts.
+- **Import** on Map points replaces / loads the map list. A units file offered here will be rejected with a pointer to Units Import.
+- **Import** on Units replaces the unit table and dock positions; map points stay as they are unless you import a full board bundle that the parser accepts.
 - Confirm the replace dialog before overwriting a good table under radio load.
 
 ## Recommended cadence
 
 1. After check-in cleanup — Export units.
-2. After snap review on a new GeoPDF — Export snap points.
+2. After Map points review on a new GeoPDF — Export map points.
 3. Before shift handoff — Save + Export both.
 4. If live viewers drop — you still have Export; viewers keep their last received snapshot only.
 

@@ -47,27 +47,29 @@ select {
 .app-bar {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   position: relative;
-  text-align: center;
-  gap: 0.35rem;
-  padding: 1.35rem 1.25rem 1.1rem;
+  text-align: left;
+  gap: 0.15rem;
+  padding: 1.1rem 1.25rem 1rem;
+}
+
+.app-bar-titles {
+  padding-right: 16rem;
+}
+
+.eyebrow,
+.app-bar h1 {
+  margin: 0;
+  font-size: 2.4rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
 }
 
 .eyebrow {
-  margin: 0;
-  font-size: 0.82rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
   color: var(--muted);
-}
-
-.app-bar h1 {
-  margin: 0;
-  font-size: 2rem;
-  font-weight: 700;
-  letter-spacing: -0.03em;
 }
 
 .live-controls {
@@ -305,6 +307,38 @@ select {
   overflow: hidden;
 }
 
+.side-section.collapsed {
+  flex: 0 0 auto;
+  overflow: visible;
+}
+
+.disclosure {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.disclosure .chevron {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(-45deg);
+  flex-shrink: 0;
+}
+
+.disclosure[aria-expanded="true"] .chevron {
+  transform: rotate(45deg);
+  margin-top: -0.15rem;
+}
+
 .table-split {
   flex: 0 0 10px;
   align-self: stretch;
@@ -362,6 +396,38 @@ select {
   align-items: center;
   justify-content: space-between;
   gap: 0.25rem;
+  position: relative;
+  padding-right: 0.35rem;
+}
+
+.col-resize {
+  position: absolute;
+  top: 0;
+  right: -0.35rem;
+  width: 0.7rem;
+  height: 100%;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: col-resize;
+  touch-action: none;
+}
+
+.col-resize::after {
+  content: "";
+  position: absolute;
+  top: 0.15rem;
+  bottom: 0.15rem;
+  left: 50%;
+  width: 2px;
+  transform: translateX(-50%);
+  background: rgba(26, 35, 48, 0.18);
+  border-radius: 99px;
+}
+
+.col-resize:hover::after,
+.col-resize:focus-visible::after {
+  background: #2b4c6f;
 }
 
 .kebab {
@@ -615,7 +681,7 @@ select {
 }
 
 .table-wrap {
-  overflow: visible;
+  overflow: auto;
   flex: 1;
   padding: 0 0.65rem 0.75rem;
 }
@@ -625,6 +691,12 @@ table {
   border-collapse: separate;
   border-spacing: 0 0.28rem;
   font-size: 0.75rem;
+}
+
+table.unit-table {
+  table-layout: fixed;
+  width: max-content;
+  min-width: 100%;
 }
 
 th {
@@ -1035,9 +1107,13 @@ tr.drag-over td {
     padding-bottom: 0.85rem;
   }
 
+  .app-bar-titles {
+    padding-right: 0;
+  }
+
   .live-controls {
     position: static;
-    justify-content: center;
+    justify-content: flex-start;
     transform: none;
   }
 }

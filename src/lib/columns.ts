@@ -27,6 +27,23 @@ export const DEFAULT_COLUMNS: ColumnVisibility = {
 };
 
 const STORAGE_KEY = "med-dashboard-unit-columns";
+const WIDTH_STORAGE_KEY = "med-dashboard-unit-column-widths";
+
+export type ColumnWidths = Record<UnitColumnId, number>;
+
+export const MIN_COLUMN_WIDTH_PX = 72;
+
+export const DEFAULT_COLUMN_WIDTHS: ColumnWidths = {
+  vendor: 140,
+  fireName: 140,
+  kind: 150,
+  leaderName: 120,
+  leaderPhone: 120,
+  capability: 88,
+  location: 140,
+  status: 120,
+  actions: 140,
+};
 
 export function visibleCount(vis: ColumnVisibility): number {
   return UNIT_COLUMNS.reduce((n, col) => n + (vis[col.id] ? 1 : 0), 0);
@@ -65,4 +82,37 @@ export function toggleColumn(vis: ColumnVisibility, id: UnitColumnId): ColumnVis
   const next = { ...vis, [id]: !vis[id] };
   if (visibleCount(next) === 0) return vis;
   return next;
+}
+
+export function clampColumnWidth(px: number): number {
+  if (!Number.isFinite(px)) return MIN_COLUMN_WIDTH_PX;
+  return Math.max(MIN_COLUMN_WIDTH_PX, Math.round(px));
+}
+
+export function parseColumnWidths(raw: unknown): ColumnWidths {
+  const next = { ...DEFAULT_COLUMN_WIDTHS };
+  if (!raw || typeof raw !== "object") return next;
+  const rec = raw as Record<string, unknown>;
+  for (const col of UNIT_COLUMNS) {
+    if (typeof rec[col.id] === "number") next[col.id] = clampColumnWidth(rec[col.id] as number);
+  }
+  return next;
+}
+
+export function loadColumnWidths(): ColumnWidths {
+  try {
+    const raw = localStorage.getItem(WIDTH_STORAGE_KEY);
+    if (!raw) return { ...DEFAULT_COLUMN_WIDTHS };
+    return parseColumnWidths(JSON.parse(raw));
+  } catch {
+    return { ...DEFAULT_COLUMN_WIDTHS };
+  }
+}
+
+export function saveColumnWidths(widths: ColumnWidths): void {
+  try {
+    localStorage.setItem(WIDTH_STORAGE_KEY, JSON.stringify(widths));
+  } catch {
+    /* private mode / quota */
+  }
 }
