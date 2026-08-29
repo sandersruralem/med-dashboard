@@ -214,6 +214,29 @@ select {
   gap: 0.75rem;
 }
 
+.map-float-pdf {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+  text-align: left;
+}
+
+.map-float-pdf-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.map-float-pdf h2 {
+  margin: 0;
+}
+
+.map-float-pdf .pdf-status {
+  margin: 0;
+}
+
 .map-float h2,
 .section-head h2 {
   margin: 0;
@@ -669,6 +692,12 @@ select {
 .leaflet-host .leaflet-container {
   height: 100%;
   width: 100%;
+}
+
+/* Sit +/− under the white overlay instead of overlapping it. */
+.leaflet-host .leaflet-top {
+  top: 5.75rem;
+  z-index: 400;
 }
 
 .geopdf-tiles {

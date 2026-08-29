@@ -1,7 +1,7 @@
 {
   "name": "med-dashboard",
   "private": true,
-  "version": "2.1.1",
+  "version": "2.1.2",
   "license": "PolyForm-Noncommercial-1.0.0",
   "type": "module",
   "main": "electron-dist/main.cjs",

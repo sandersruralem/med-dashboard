@@ -17,7 +17,7 @@ cd C:\Cursor\Med_dashboard
 npm.cmd run portable:pack
 ```
 
-That writes `release/MedBoard-LAN` and `release/MedBoard-LAN-portable.zip`. GitHub Releases also have a versioned zip (v2.1.1 is `MedBoard-LAN-2.1.1-portable.zip`).
+That writes `release/MedBoard-LAN` and `release/MedBoard-LAN-portable.zip`. GitHub Releases also have a versioned zip (v2.1.2 is `MedBoard-LAN-2.1.2-portable.zip`).
 
 Copy the whole `MedBoard-LAN` folder to a USB stick. On the ICP laptop:
 

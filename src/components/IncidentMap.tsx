@@ -194,59 +194,65 @@ export function IncidentMap() {
     <div className="map-pane">
       <div className="map-float">
         <div className="map-float-top">
-          <div>
-            <h2>Incident map</h2>
-            <p className="pdf-status">
-              {pdfBusy
-                ? readOnly
-                  ? "Loading shared map…"
-                  : "Loading High Lava ops map…"
-                : pdfError
-                  ? pdfError
-                  : overlay
-                    ? overlay.name
-                    : "No PDF"}
-            </p>
-          </div>
           {!readOnly ? (
-            <label className="btn ghost pdf-upload">
-              Add PDF
-              <input type="file" accept="application/pdf" onChange={(e) => onFile(e.target.files?.[0])} />
-            </label>
-          ) : null}
-        </div>
-        {!readOnly ? <div className="place-form">
-          <input
-            className="field"
-            value={label}
-            onChange={(e) => applyLabelHint(e.target.value)}
-            placeholder="DP-12, H-3, ICP…"
-            aria-label="New point label"
-          />
-          <select
-            className="field"
-            value={category}
-            onChange={(e) => setCategory(e.target.value as MapPointCategory)}
-            aria-label="Point type"
-          >
-            {CATEGORIES.map((c) => (
-              <option key={c} value={c}>
-                {CATEGORY_LABELS[c]}
-              </option>
-            ))}
-          </select>
-          <button type="button" className={placeMode && !moving ? "btn primary" : "btn"} onClick={() => setPlaceMode((v) => !v)}>
-            {placeMode && !moving ? "Click map to place" : "Place point"}
-          </button>
-          {moving ? (
-            <>
-              <span className="move-hint">Click the map or drag the marker to move {moving.label}</span>
-              <button type="button" className="btn" onClick={cancelRelocate}>
-                Cancel move
+            <div className="place-form">
+              <input
+                className="field"
+                value={label}
+                onChange={(e) => applyLabelHint(e.target.value)}
+                placeholder="DP-12, H-3, ICP…"
+                aria-label="New point label"
+              />
+              <select
+                className="field"
+                value={category}
+                onChange={(e) => setCategory(e.target.value as MapPointCategory)}
+                aria-label="Point type"
+              >
+                {CATEGORIES.map((c) => (
+                  <option key={c} value={c}>
+                    {CATEGORY_LABELS[c]}
+                  </option>
+                ))}
+              </select>
+              <button type="button" className={placeMode && !moving ? "btn primary" : "btn"} onClick={() => setPlaceMode((v) => !v)}>
+                {placeMode && !moving ? "Click map to place" : "Place point"}
               </button>
-            </>
-          ) : null}
-        </div> : null}
+              {moving ? (
+                <>
+                  <span className="move-hint">Click the map or drag the marker to move {moving.label}</span>
+                  <button type="button" className="btn" onClick={cancelRelocate}>
+                    Cancel move
+                  </button>
+                </>
+              ) : null}
+            </div>
+          ) : (
+            <div />
+          )}
+          <div className="map-float-pdf">
+            {!readOnly ? (
+              <label className="btn ghost pdf-upload">
+                Add PDF
+                <input type="file" accept="application/pdf" onChange={(e) => onFile(e.target.files?.[0])} />
+              </label>
+            ) : null}
+            <div className="map-float-pdf-copy">
+              <h2>Incident map</h2>
+              <p className="pdf-status">
+                {pdfBusy
+                  ? readOnly
+                    ? "Loading shared map…"
+                    : "Loading High Lava ops map…"
+                  : pdfError
+                    ? pdfError
+                    : overlay
+                      ? overlay.name
+                      : "No PDF"}
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
       <MapContainer className="leaflet-host" center={[45.88, -122.11]} zoom={11} scrollWheelZoom attributionControl>
         <TileLayer
