@@ -1,50 +1,27 @@
 # 1. Start of shift
 
-Goal: one editor keyboard at ICP, a north-up map with the current ops GeoPDF, and a clean unit list before traffic picks up.
+You want one editor keyboard, the current ops GeoPDF facing north, and a unit list you trust before the radio gets busy.
 
-## Before you open the board
+Confirm you are the editor for this shift. Viewers stay read-only if you disconnect. Pick one path — the USB folder (`Start-MedBoard.cmd`) or the hosted HTTPS board — and stay on it. A localhost editor will not drive Pages viewers. If this is a new browser or laptop, have last shift’s Export JSON handy.
 
-- Confirm you are the **editor** for this shift (one RADO). Viewers do not get edit rights if you disconnect.
-- Know whether you are using the **LAN USB folder** (`Start-MedBoard.cmd`) or the **hosted** HTTPS board. Do not mix an editor session from localhost with viewers on a different origin.
-- Have yesterday’s **Export** JSON (units and/or map points) on hand if this browser or laptop is new.
+## USB at ICP
 
-## Boot (LAN at ICP)
+Copy the `MedBoard-LAN` folder from the stick (or unzip `MedBoard-LAN-portable.zip`). Copy it to the Desktop if the agency will not run programs from USB. Double-click `Start-MedBoard.cmd` and leave the console open. The board opens at this laptop’s LAN IP, port 8787 (or 8788–8796). If the firewall asks, allow `node.exe` on a private network for those ports. Packaging notes are in [HOSTING.md](../HOSTING.md).
 
-1. Copy the `MedBoard-LAN` folder from USB (or unzip `MedBoard-LAN-portable.zip`). If the agency blocks running from removable media, copy the folder to the Desktop first.
-2. Double-click `Start-MedBoard.cmd`. Leave the console window open.
-3. The board opens in the default browser at this laptop’s LAN IP (port **8787**, or the next free port through **8796**).
-4. If Windows Firewall asks, allow **node.exe** on a **private** network for ports **8787–8796**.
-5. Packaging details: [HOSTING.md](../HOSTING.md).
+## Hosted
 
-## Boot (hosted)
-
-1. Open **https://med-dashboard-8ov.pages.dev/** in Edge/Chrome **on the editor machine** (not localhost).
-2. Click **Share board** only from that same origin so the editor credential stays in this browser’s session storage. The dialog shows the HTTPS link and a QR code.
+Open [https://med-dashboard-8ov.pages.dev/](https://med-dashboard-8ov.pages.dev/) in Edge or Chrome on the editor machine. Click **Share board** on that same page so the editor key stays in this browser. The dialog shows the HTTPS link and a QR.
 
 ## Restore or import
 
-- Same browser as last shift: the board may show **Restored the last saved board in this browser.** Review units and Map points before trusting it.
-- New machine or empty board: use **Import** on the Units header and/or Map points with the JSON you exported last shift.
-- Prefer a known-good Export over rebuilding the whole table from memory under radio load.
+Same browser as last shift may say it restored the last saved board. Look at units and Map points before you trust it. On a new machine, Import the JSON you exported last time — Units header for the table, Map points for the list. A known-good file beats rebuilding from memory under radio load.
 
-## Confirm the map
+## Check the map and table
 
-1. Confirm the GeoPDF basemap is the current ops product (bundled sample or load the incident PDF).
-2. Zoom/pan only — the map stays **true north** (no rotation).
-3. Open **Map points**: accepted points are what the table and markers snap to. Fix labels before you start moving units (chapter 2).
+Confirm the GeoPDF is today’s ops product (bundled sample or **Add PDF**). Zoom and pan only; the map stays true north. Open **Map points** and fix DP / H / ICP labels before you start moving units (chapter 2).
 
-## Confirm the unit table
+Scan fire names, ALS/BLS, and locations. Hide unused columns with the kebab if the pane is tight. Leave leader names and phones out of URLs and chat titles.
 
-1. Scan fire names, capability (ALS/BLS), and locations.
-2. Hide unused columns with the column kebab if the pane is cramped.
-3. Do **not** put leader phone or names into any URL or chat title when you share the board later.
-
-## Ready checklist
-
-- [ ] Editor window open; you are not on a viewer-only link
-- [ ] Map shows the right GeoPDF and north is up
-- [ ] Map points reviewed enough to trust DP / H / ICP labels
-- [ ] Units list matches check-in (or last Export)
-- [ ] **Share board** only when MEDL/SITL need the live view (chapter 4)
+Before you call it ready: you are on the editor window (not a viewer link), the map is the right PDF and north is up, Map points look trustworthy, the unit list matches check-in or last Export, and you only hit **Share board** when MEDL or SITL actually need it (chapter 4).
 
 Next: [Map and snap points](02-map-and-snap-points.md)

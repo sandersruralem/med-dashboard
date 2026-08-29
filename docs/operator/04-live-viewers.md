@@ -1,45 +1,21 @@
 # 4. Live viewers
 
-**Share board** gives MEDL, SITL, and others a live read-only copy of map points, units, placements, and the **same GeoPDF** the editor is using (bundled High Lava or a PDF they added). Viewers tile that file locally. Anyone with the link can read the ops map.
+**Share board** gives MEDL, SITL, and anyone else a live read-only copy of map points, units, and the same GeoPDF you are using (bundled High Lava or a PDF you added). They tile that file in their own browser. The person who clicked Share board is the editor. Everyone else on the `#room=…` link is a viewer.
 
-## Editor vs viewer
+If you close the editor, the room keeps the last snapshot. No viewer is promoted. Start a new Share from the RADO’s saved or exported board if that session is gone.
 
-| | Editor (RADO) | Viewer |
-| --- | --- | --- |
-| Who | The browser that clicked **Share board** (or holds the editor key in session storage) | Anyone opening the copied `#room=…` link without that key |
-| Can edit | Yes | No — **Live view — read only** |
-| If editor closes | Room keeps last snapshot; **no viewer is promoted** | Keeps last received snapshot if disconnected |
+## USB folder
 
-Start a **new** Share board from the RADO’s saved/exported board if the editor session is lost.
+In the browser that `Start-MedBoard.cmd` opened, click **Share board**. You get a QR and a link like `http://<this-laptop-LAN-IP>:<port>/#room=…` (usually port 8787). It will not be `127.0.0.1`. Viewers on the same incident LAN open that URL in Edge or Chrome. If they cannot connect, allow inbound TCP 8787–8796 on the RADO machine.
 
-## LAN (USB folder)
+The room id is opaque on purpose. Leave incident name, leader name, and phone out of the link.
 
-1. On the editor browser that `Start-MedBoard.cmd` opened, click **Share board**.
-2. The dialog shows a QR code and a link like `http://<this-laptop-LAN-IP>:<port>/#room=…` (port usually **8787**). It is never `127.0.0.1`.
-3. Viewers on the **same incident LAN** open that URL or scan the QR in Edge or Chrome.
-4. Allow firewall inbound TCP **8787–8796** on the RADO machine if viewers cannot connect.
+## Hosted
 
-Do not put incident name, leader name, or phone in the link. The room id is opaque on purpose.
+Open [https://med-dashboard-8ov.pages.dev/](https://med-dashboard-8ov.pages.dev/) as the editor — not localhost — and click **Share board** there. The copied link is `https://med-dashboard-8ov.pages.dev/#room=…`. A localhost editor will not control Pages viewers even if the room id looks similar. How the PartyKit host gets into the build is in [HOSTING.md](../HOSTING.md).
 
-## Hosted (Cloudflare Pages + live room)
+Anyone with the viewer URL can read leader contact fields and the ops map. Treat the link like exported units JSON. Prefer the incident LAN or that known HTTPS origin over a public chat channel.
 
-1. Open **https://med-dashboard-8ov.pages.dev/** as the editor (not localhost).
-2. Click **Share board** so the editor key is stored on that origin. The dialog shows the HTTPS link and QR.
-3. Copied link is `https://med-dashboard-8ov.pages.dev/#room=…`.
-4. A localhost editor does **not** control Pages viewers even if the room id looks similar.
-
-Live sockets use the PartyKit host configured at build time (see [HOSTING.md](../HOSTING.md)). Do not put that hostname in a chat title with incident or leader details.
-
-Deploy details: [HOSTING.md](../HOSTING.md).
-
-## Security mindset
-
-Anyone with the viewer URL can read the board, including leader contact fields and the shared ops map. Treat the link like the exported units JSON. Prefer incident LAN or a known HTTPS origin — not a public chat channel.
-
-## Disconnect behavior
-
-- Banner may show connecting / disconnected states.
-- Viewers who never received a snapshot will not see your local autosave board (by design).
-- Keep **Save** / **Export** as the WAN-loss fallback (chapter 5).
+Banners show connecting or disconnected. A viewer who never got a snapshot will not see your local autosave. Keep Save and Export for when the network drops (chapter 5).
 
 Next: [Save, export, import](05-save-export-import.md) · Back: [Units and movement](03-units-and-movement.md)

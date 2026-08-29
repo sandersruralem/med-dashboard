@@ -1,39 +1,15 @@
 # 5. Save, export, and import
 
-Live Share board is convenience. **Save** and **Export** are how you survive a crashed browser, a new laptop, or lost WAN.
+Share board is convenient. Save and Export are what you have after a crashed browser, a new laptop, or a dead WAN.
 
-## Save (this browser)
+**Save** writes map points and units into this browser. Pages and the USB folder do not share that storage, so Export if you change machines. You should see a notice that map points and units were saved here.
 
-- **Save** writes map points and units into this browser’s storage (origin-scoped).
-- Hosted Pages and the LAN USB folder do **not** share the same storage — Export if you move machines.
-- Success notice: map points and units saved in this browser.
+**Export** on Map points writes the reviewed list. **Export** on Units writes the table and dock positions. Filenames have a timestamp. Leader names and phones are in the units file.
 
-## Export
+**Import** on Map points replaces that list. A units file dropped there will be refused — use Units Import. **Import** on Units replaces the table and docks; map points stay unless the file is a full board bundle. Confirm the replace dialog before you overwrite a good table under radio load.
 
-Use the section actions:
+A workable rhythm: Export units after check-in cleanup, Export map points after you review a new GeoPDF, Save and Export both before handoff. If live viewers drop, you still have the files. They only keep the last snapshot they already received.
 
-| Control | File contents |
-| --- | --- |
-| Map points **Export** | Accepted / reviewed map points JSON |
-| Units **Export** | Unit rows and dock placements JSON |
-
-Filenames are time-stamped. Leader names and phones are in the units file — keep it off casual shared drives if that matters.
-
-## Import
-
-- **Import** on Map points replaces / loads the map list. A units file offered here will be rejected with a pointer to Units Import.
-- **Import** on Units replaces the unit table and dock positions; map points stay as they are unless you import a full board bundle that the parser accepts.
-- Confirm the replace dialog before overwriting a good table under radio load.
-
-## Recommended cadence
-
-1. After check-in cleanup — Export units.
-2. After Map points review on a new GeoPDF — Export map points.
-3. Before shift handoff — Save + Export both.
-4. If live viewers drop — you still have Export; viewers keep their last received snapshot only.
-
-## Daily PDF replace
-
-New ops GeoPDF: update the map and re-review points. Keep resource WGS84 placements unless you intentionally Import a different units file. See [Map and snap points](02-map-and-snap-points.md).
+New ops PDF: Add PDF, re-review Map points, leave resource WGS84 placements unless you mean to Import a different units file. See [Map and snap points](02-map-and-snap-points.md).
 
 Next: [Limits and handoff](06-limits-and-handoff.md) · Back: [Live viewers](04-live-viewers.md)

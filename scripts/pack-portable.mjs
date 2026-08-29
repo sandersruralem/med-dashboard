@@ -97,6 +97,10 @@ async function main() {
   ]);
 
   copyFileSync(extractedExe, path.join(outDir, "node.exe"));
+  const appLicense = path.join(root, "LICENSE");
+  if (existsSync(appLicense)) {
+    copyFileSync(appLicense, path.join(outDir, "LICENSE"));
+  }
   const nodeLicense = path.join(extractDir, "LICENSE");
   if (existsSync(nodeLicense)) {
     copyFileSync(nodeLicense, path.join(outDir, "LICENSE-NODE.txt"));

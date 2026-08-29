@@ -1,46 +1,25 @@
 # 6. Limits and handoff
 
-## What this board is not
+This board tracks where medical resources are. It does not replace IWI logs, clinical notes, GAR, return-to-work, ICS 209 or other official status, REMS dual reporting, live GPS, NIFS, Event GDB, shapefiles, map rotation, or ILS.
 
-Do not use Med Dashboard as a substitute for:
+Leave leader name, phone, and incident name out of URLs, folder names, and environment variables. A viewer link shows the same fields as an Export, including the ops map. Patient and PCR data do not belong here.
 
-- IWI event logging or clinical documentation
-- GAR or return-to-work workflows
-- ICS form generation or official resource status (ICS 209, etc.)
-- REMS dual reporting systems
-- Live GPS / NIFS / Event GDB / shapefile import
-- Map rotation or ILS capability tracking
+## Handoff
 
-It is a **location and movement board** for one editor and optional read-only viewers.
+Save in the editor browser. Export units and map points and leave those files where the incoming RADO can find them. Brief which GeoPDF you are on, any labels you still dispute, who is still en route (yellow), and any Emergency toggles still on.
 
-## Privacy and OPSEC
+To keep live share going, leave this editor browser open, or start a new Share board after the incoming operator imports on their own editor window. Closing the editor does not promote a viewer. On the USB folder, closing the console stops the server — tell viewers the feed is ending; they keep what they already have.
 
-- No leader name, phone, or incident name in URLs, exe names, or environment variables.
-- Viewer links expose board fields and the shared ops map — treat like Export JSON.
-- Patient / PCR fields do not belong on this product.
+At the end of the incident, Export a final copy for Planning or MEDL if your IMT wants it. Secure files that have leader phones. Do not leave Share board sitting on a public URL on an unattended machine.
 
-## Shift handoff
+## If something is off
 
-1. **Save** in the editor browser.
-2. **Export** units and map points; leave files where the incoming RADO can find them.
-3. Brief: which GeoPDF, any disputed snap labels, units still en route (yellow), any Emergency (red) toggles still on.
-4. If live share must continue: keep the **same editor browser/session** open, or start a **new Share board** after the incoming operator restores/imports on their editor window. Closing the editor does not promote a viewer.
-5. LAN USB folder: closing the console or `Start-MedBoard.cmd` stops the server. Tell viewers the live feed will end; they retain the last snapshot already received.
-
-## End of incident / laptop leave
-
-- Export final units + snaps for Planning / MEDL records as your IMT requires.
-- Clear or secure Export files that contain leader phones.
-- Do not leave an open Share board on an unattended public URL.
-
-## When something breaks
-
-| Symptom | What to try |
+| What you see | Try |
 | --- | --- |
-| Viewers cannot open LAN link | Same Wi‑Fi/LAN? Firewall 8787–8796? Correct IP and port from Share board? |
-| “Live host is not configured” on hosted build | Rebuild Pages with `VITE_PARTYKIT_HOST` set — [HOSTING.md](../HOSTING.md) |
-| Viewer sees empty / connecting forever | Editor must have Shared from that origin; wait for sync or Export/Import offline |
-| Smart App Control blocks a custom exe | Use the USB folder (`Start-MedBoard.cmd` + official `node.exe`), not an unsigned `MedBoard-LAN.exe` — [HOSTING.md](../HOSTING.md) |
-| Marker “didn’t move” after typing DP | Press **Arrive** or drop on the map — type alone keeps marker at source while en route |
+| Viewers cannot open the LAN link | Same Wi‑Fi? Firewall 8787–8796? IP and port from Share board? |
+| “Live host is not configured” on Pages | Rebuild Pages with `VITE_PARTYKIT_HOST` set — [HOSTING.md](../HOSTING.md) |
+| Viewer stuck empty or connecting | Editor Shared from that same origin; or Export/Import offline |
+| Smart App Control blocks a custom exe | Use the USB folder (`Start-MedBoard.cmd` and official `node.exe`) |
+| Marker did not move after you typed DP | Press **Arrive** or drop on the map |
 
 Back: [Save, export, import](05-save-export-import.md) · Index: [Operator guide](README.md)
