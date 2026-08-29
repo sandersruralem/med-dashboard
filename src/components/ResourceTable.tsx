@@ -42,7 +42,7 @@ function ColumnHead({
     const startW = width;
 
     const onMove = (ev: PointerEvent) => {
-      onResize(id, clampColumnWidth(startW + (ev.clientX - startX)));
+      onResize(id, clampColumnWidth(startW + (ev.clientX - startX), id));
     };
     const onUp = () => {
       handle.removeEventListener("pointermove", onMove);
@@ -282,13 +282,14 @@ export function ResourceTable() {
                     <td style={colStyle(widths.kind)}>
                       <select
                         className="field cell kind-select"
-                        value={r.kind}
+                        value={r.kind === "firefighter" ? (r.capability === "ALS" ? "line_paramedic" : "line_emt") : r.kind}
                         disabled={readOnly}
                         onChange={(e) => updateResource(r.id, { kind: e.target.value as MarkerKind })}
                         aria-label={`Type for ${r.fireName}`}
                       >
                         <option value="ambulance">Ambulance</option>
-                        <option value="firefighter">Line EMT / Paramedic</option>
+                        <option value="line_emt">Line EMT</option>
+                        <option value="line_paramedic">Line Paramedic</option>
                         <option value="rems_pickup">REMS</option>
                       </select>
                     </td>

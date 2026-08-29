@@ -51,25 +51,20 @@ select {
   justify-content: center;
   position: relative;
   text-align: left;
-  gap: 0.15rem;
-  padding: 1.1rem 1.25rem 1rem;
+  padding: 0.55rem 1.25rem;
 }
 
 .app-bar-titles {
   padding-right: 16rem;
 }
 
-.eyebrow,
 .app-bar h1 {
   margin: 0;
-  font-size: 2.4rem;
+  font-size: 1.35rem;
   font-weight: 700;
-  letter-spacing: -0.03em;
-  line-height: 1.1;
-}
-
-.eyebrow {
-  color: var(--muted);
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  white-space: nowrap;
 }
 
 .live-controls {
@@ -622,9 +617,9 @@ select {
 }
 
 .swatch {
-  font-size: 0.66rem;
+  font-size: 0.85rem;
   color: var(--muted);
-  padding: 0.12rem 0.45rem 0.12rem 0.7rem;
+  padding: 0.16rem 0.5rem 0.12rem 0.85rem;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.6);
   position: relative;
@@ -633,10 +628,10 @@ select {
 .swatch::before {
   content: "";
   position: absolute;
-  left: 0.28rem;
+  left: 0.32rem;
   top: 50%;
-  width: 0.28rem;
-  height: 0.28rem;
+  width: 0.38rem;
+  height: 0.38rem;
   border-radius: 50%;
   transform: translateY(-50%);
 }
@@ -697,6 +692,10 @@ table.unit-table {
   table-layout: fixed;
   width: max-content;
   min-width: 100%;
+}
+
+table.unit-table td {
+  overflow: hidden;
 }
 
 th {
@@ -820,15 +819,19 @@ td:last-child {
 }
 
 .kind-select {
-  width: 9.5rem;
+  width: 11rem;
 }
 
 .combo {
   position: relative;
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .loc-input {
-  width: 8.2rem;
+  width: 100%;
+  min-width: 0;
 }
 
 .combo .loc-input {
@@ -1109,6 +1112,10 @@ tr.drag-over td {
 
   .app-bar-titles {
     padding-right: 0;
+  }
+
+  .app-bar h1 {
+    white-space: normal;
   }
 
   .live-controls {

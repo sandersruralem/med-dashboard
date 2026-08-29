@@ -17,7 +17,7 @@ export const seedResources: MedicalResource[] = [
     leaderName: "R. Chen",
     leaderPhone: "530-555-0144",
     capability: "BLS",
-    kind: "firefighter",
+    kind: "line_emt",
   },
   {
     id: "r-3",

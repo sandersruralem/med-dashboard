@@ -2,7 +2,7 @@
 
 The table and the map share one placement store, so a location you type and a marker you drag cannot drift apart.
 
-Ambulance, firefighter (line EMT / medic), and off-road pickup (REMS). Capability is ALS or BLS — no ILS.
+Ambulance, Line EMT, Line Paramedic, and REMS. Capability is ALS or BLS — no ILS.
 
 Vendor, fire name, leader, phone, ALS/BLS, location, status, and Arrive / Emergency are the usual columns. Edit cells in place (editor only). The kebab shows or hides columns and remembers that in this browser. Drag the handle on the left, or Alt+arrows, to reorder. **Add resource** and **Remove units** are on the Units header. Leader name and phone are contact fields, not patient PHI, but still treat the Export file with care.
 

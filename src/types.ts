@@ -1,6 +1,13 @@
 export type Capability = "ALS" | "BLS";
 
-export type MarkerKind = "ambulance" | "firefighter" | "rems_pickup";
+export type MarkerKind = "ambulance" | "firefighter" | "line_emt" | "line_paramedic" | "rems_pickup";
+
+/** Old boards stored a single firefighter kind. Split it using ALS/BLS. */
+export function normalizeMarkerKind(kind: string, capability: Capability): MarkerKind | null {
+  if (kind === "ambulance" || kind === "line_emt" || kind === "line_paramedic" || kind === "rems_pickup") return kind;
+  if (kind === "firefighter") return capability === "ALS" ? "line_paramedic" : "line_emt";
+  return null;
+}
 
 export type DutyStatus = "at_location" | "on_scene" | "enroute" | "returned";
 

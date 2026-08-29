@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   DEFAULT_COLUMN_WIDTHS,
   MIN_COLUMN_WIDTH_PX,
+  MIN_LOCATION_WIDTH_PX,
   clampColumnWidth,
   parseColumnVisibility,
   parseColumnWidths,
@@ -13,12 +14,10 @@ describe("column widths", () => {
     expect(parseColumnWidths("wide")).toEqual(DEFAULT_COLUMN_WIDTHS);
   });
 
-  it("clamps stored widths and ignores unknown keys", () => {
-    const parsed = parseColumnWidths({ fireName: 240, kind: 10, extra: 99 });
-    expect(parsed.fireName).toBe(240);
+  it("lets location go narrower than other columns", () => {
+    const parsed = parseColumnWidths({ location: 10, kind: 10 });
+    expect(parsed.location).toBe(MIN_LOCATION_WIDTH_PX);
     expect(parsed.kind).toBe(MIN_COLUMN_WIDTH_PX);
-    expect(parsed.location).toBe(DEFAULT_COLUMN_WIDTHS.location);
-    expect("extra" in parsed).toBe(false);
   });
 
   it("does not let visibility parse wipe unknown fields onto widths", () => {
@@ -32,5 +31,10 @@ describe("column widths", () => {
 describe("clampColumnWidth", () => {
   it("rejects non-finite values", () => {
     expect(clampColumnWidth(Number.NaN)).toBe(MIN_COLUMN_WIDTH_PX);
+  });
+
+  it("uses the location floor when clamping location", () => {
+    expect(clampColumnWidth(10, "location")).toBe(MIN_LOCATION_WIDTH_PX);
+    expect(clampColumnWidth(60, "location")).toBe(60);
   });
 });

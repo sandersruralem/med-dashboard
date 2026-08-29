@@ -4,12 +4,12 @@ import type {
   DutyStatus,
   MapPoint,
   MapPointCategory,
-  MarkerKind,
   MedicalResource,
   MovementState,
   ResourcePlacement,
   ReviewStatus,
 } from "../types";
+import { normalizeMarkerKind } from "../types";
 
 export type { BoardSnapshot } from "../types";
 
@@ -32,7 +32,6 @@ const CATEGORIES = new Set<MapPointCategory>([
   "lookout",
   "incident_base",
 ]);
-const KINDS = new Set<MarkerKind>(["ambulance", "firefighter", "rems_pickup"]);
 const CAPS = new Set<Capability>(["ALS", "BLS"]);
 const DUTIES = new Set<DutyStatus>(["at_location", "on_scene", "enroute", "returned"]);
 const MOVEMENTS = new Set<MovementState>(["at_icp_camp", "en_route", "at_other", "moving", "returning"]);
@@ -92,7 +91,8 @@ function parseResource(v: unknown): MedicalResource | null {
   const kind = asString(v.kind);
   if (!id || vendor === null || fireName === null || leaderName === null || leaderPhone === null) return null;
   if (!capability || !CAPS.has(capability as Capability)) return null;
-  if (!kind || !KINDS.has(kind as MarkerKind)) return null;
+  const kindNorm = kind ? normalizeMarkerKind(kind, capability as Capability) : null;
+  if (!kindNorm) return null;
   return {
     id,
     vendor,
@@ -100,7 +100,7 @@ function parseResource(v: unknown): MedicalResource | null {
     leaderName,
     leaderPhone,
     capability: capability as Capability,
-    kind: kind as MarkerKind,
+    kind: kindNorm,
   };
 }
 

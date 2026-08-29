@@ -28,7 +28,7 @@ const CATEGORIES = new Set<MapPointCategory>([
 ]);
 const SOURCES = new Set(["geopdf_extract", "manual"]);
 const REVIEWS = new Set(["pending", "accepted", "rejected"]);
-const KINDS = new Set(["ambulance", "firefighter", "rems_pickup"]);
+const KINDS = new Set(["ambulance", "firefighter", "line_emt", "line_paramedic", "rems_pickup"]);
 const CAPABILITIES = new Set(["ALS", "BLS"]);
 const MOVEMENTS = new Set(["at_icp_camp", "en_route", "at_other", "moving", "returning"]);
 const DUTIES = new Set(["at_location", "on_scene", "enroute", "returned"]);

@@ -1,4 +1,4 @@
-# Med Dashboard
+# Wildfire Medical Resource Tracking (WMRT)
 
 A two-pane board for tracking ambulances, EMTs, and REMS on a wildfire incident. You load a GISS GeoPDF, mark the points you trust, and keep units on a north-up map next to a live table. One person at ICP edits (usually the RADO). Everyone else can watch a read-only Share link.
 

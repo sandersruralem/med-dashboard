@@ -76,8 +76,7 @@ function BoardApp() {
     <div className="app">
         <header className="app-bar">
           <div className="app-bar-titles">
-            <p className="eyebrow">Wildfire medical tracker</p>
-            <h1>Resource board</h1>
+            <h1>Wildfire Medical Resource Tracking (WMRT)</h1>
           </div>
           <div className="live-controls">
             {!readOnly ? (
