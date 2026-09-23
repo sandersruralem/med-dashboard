@@ -10,6 +10,26 @@ import { unitMarkerLabel, unitMarkerSrc } from "../lib/unitMarker";
 import { useStore } from "../store";
 import { rowTone, CATEGORY_LABELS, type Capability, type MapPoint, type MapPointCategory, type MarkerKind } from "../types";
 
+const PLACE_FORM_OPEN_KEY = "med-dashboard-place-form-open";
+
+function loadPlaceFormOpen(): boolean {
+  try {
+    const raw = localStorage.getItem(PLACE_FORM_OPEN_KEY);
+    if (raw === null) return true;
+    return raw !== "0";
+  } catch {
+    return true;
+  }
+}
+
+function savePlaceFormOpen(open: boolean): void {
+  try {
+    localStorage.setItem(PLACE_FORM_OPEN_KEY, open ? "1" : "0");
+  } catch {
+    /* private mode / quota */
+  }
+}
+
 const CATEGORIES: MapPointCategory[] = [
   "drop_point",
   "junction",
@@ -110,6 +130,7 @@ export function IncidentMap() {
   const [label, setLabel] = useState("ICP");
   const [category, setCategory] = useState<MapPointCategory>("icp");
   const [placeMode, setPlaceMode] = useState(true);
+  const [placeFormOpen, setPlaceFormOpen] = useState(loadPlaceFormOpen);
   const [preview, setPreview] = useState(true);
   const loadedOnce = useRef(false);
   const skipClickUntil = useRef(0);
@@ -137,6 +158,10 @@ export function IncidentMap() {
       cancelled = true;
     };
   }, [setOverlay, setPdfBusy, readOnly]);
+
+  useEffect(() => {
+    savePlaceFormOpen(placeFormOpen);
+  }, [placeFormOpen]);
 
   useEffect(() => {
     setPreview(true);
@@ -192,9 +217,18 @@ export function IncidentMap() {
 
   return (
     <div className="map-pane">
-      <div className="map-float">
+      <div className={placeFormOpen ? "map-float" : "map-float collapsed"}>
         <div className="map-float-top">
-          {!readOnly ? (
+          <button
+            type="button"
+            className="disclosure"
+            aria-expanded={placeFormOpen}
+            aria-label={placeFormOpen ? "Hide add point" : "Show add point"}
+            onClick={() => setPlaceFormOpen((open) => !open)}
+          >
+            <span className="chevron" aria-hidden="true" />
+          </button>
+          {!readOnly && placeFormOpen ? (
             <div className="place-form">
               <input
                 className="field"
@@ -227,9 +261,7 @@ export function IncidentMap() {
                 </>
               ) : null}
             </div>
-          ) : (
-            <div />
-          )}
+          ) : null}
           <div className="map-float-pdf">
             {!readOnly ? (
               <label className="btn ghost pdf-upload">
@@ -239,17 +271,19 @@ export function IncidentMap() {
             ) : null}
             <div className="map-float-pdf-copy">
               <h2>Incident map</h2>
-              <p className="pdf-status">
-                {pdfBusy
-                  ? readOnly
-                    ? "Loading shared map…"
-                    : "Loading High Lava ops map…"
-                  : pdfError
-                    ? pdfError
-                    : overlay
-                      ? overlay.name
-                      : "No PDF"}
-              </p>
+              {placeFormOpen ? (
+                <p className="pdf-status">
+                  {pdfBusy
+                    ? readOnly
+                      ? "Loading shared map…"
+                      : "Loading High Lava ops map…"
+                    : pdfError
+                      ? pdfError
+                      : overlay
+                        ? overlay.name
+                        : "No PDF"}
+                </p>
+              ) : null}
             </div>
           </div>
         </div>
