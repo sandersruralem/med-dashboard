@@ -207,11 +207,20 @@ select {
   pointer-events: auto;
 }
 
+.map-float.collapsed {
+  padding: 0.4rem 0.65rem;
+}
+
 .map-float-top {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
   gap: 0.75rem;
+}
+
+.map-float-top > .disclosure {
+  flex-shrink: 0;
+  padding: 0.2rem 0.15rem;
 }
 
 .map-float-pdf {
@@ -272,6 +281,8 @@ select {
   flex-wrap: wrap;
   gap: 0.4rem;
   align-items: center;
+  flex: 1;
+  min-width: 0;
 }
 
 .field,
