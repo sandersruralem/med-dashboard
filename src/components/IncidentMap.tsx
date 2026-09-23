@@ -10,6 +10,24 @@ import { unitMarkerLabel, unitMarkerSrc } from "../lib/unitMarker";
 import { useStore } from "../store";
 import { rowTone, CATEGORY_LABELS, type Capability, type MapPoint, type MapPointCategory, type MarkerKind } from "../types";
 
+const PLACE_OPEN_KEY = "med-dashboard-place-form-open";
+
+function loadPlaceFormOpen(): boolean {
+  try {
+    return localStorage.getItem(PLACE_OPEN_KEY) !== "0";
+  } catch {
+    return true;
+  }
+}
+
+function savePlaceFormOpen(open: boolean): void {
+  try {
+    localStorage.setItem(PLACE_OPEN_KEY, open ? "1" : "0");
+  } catch {
+    /* private mode / quota */
+  }
+}
+
 const CATEGORIES: MapPointCategory[] = [
   "drop_point",
   "junction",
@@ -110,9 +128,12 @@ export function IncidentMap() {
   const [label, setLabel] = useState("ICP");
   const [category, setCategory] = useState<MapPointCategory>("icp");
   const [placeMode, setPlaceMode] = useState(true);
+  const [placeOpen, setPlaceOpen] = useState(loadPlaceFormOpen);
   const [preview, setPreview] = useState(true);
   const loadedOnce = useRef(false);
   const skipClickUntil = useRef(0);
+  const mapPaneRef = useRef<HTMLDivElement>(null);
+  const mapFloatRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (loadedOnce.current) return;
@@ -143,6 +164,25 @@ export function IncidentMap() {
     const timer = window.setTimeout(() => setPreview(false), 12000);
     return () => window.clearTimeout(timer);
   }, [overlay]);
+
+  const movingId = moving?.id;
+  useEffect(() => {
+    if (movingId) setPlaceOpen(true);
+  }, [movingId]);
+
+  useEffect(() => {
+    const pane = mapPaneRef.current;
+    const float = mapFloatRef.current;
+    if (!pane || !float) return;
+    const apply = () => {
+      const top = float.getBoundingClientRect().bottom - pane.getBoundingClientRect().top + 8;
+      pane.style.setProperty("--map-float-bottom", `${Math.ceil(top)}px`);
+    };
+    apply();
+    const observer = new ResizeObserver(apply);
+    observer.observe(float);
+    return () => observer.disconnect();
+  }, []);
 
   const atCounts = useMemo(() => {
     const counts = new Map<string, string[]>();
@@ -190,34 +230,57 @@ export function IncidentMap() {
     }
   }
 
+  function togglePlaceOpen() {
+    setPlaceOpen((open) => {
+      const next = !open;
+      savePlaceFormOpen(next);
+      return next;
+    });
+  }
+
   return (
-    <div className="map-pane">
-      <div className="map-float">
+    <div className="map-pane" ref={mapPaneRef}>
+      <div className="map-float" ref={mapFloatRef}>
         <div className="map-float-top">
           {!readOnly ? (
             <div className="place-form">
-              <input
-                className="field"
-                value={label}
-                onChange={(e) => applyLabelHint(e.target.value)}
-                placeholder="DP-12, H-3, ICP…"
-                aria-label="New point label"
-              />
-              <select
-                className="field"
-                value={category}
-                onChange={(e) => setCategory(e.target.value as MapPointCategory)}
-                aria-label="Point type"
+              <button
+                type="button"
+                className="disclosure"
+                aria-expanded={placeOpen}
+                onClick={togglePlaceOpen}
               >
-                {CATEGORIES.map((c) => (
-                  <option key={c} value={c}>
-                    {CATEGORY_LABELS[c]}
-                  </option>
-                ))}
-              </select>
-              <button type="button" className={placeMode && !moving ? "btn primary" : "btn"} onClick={() => setPlaceMode((v) => !v)}>
-                {placeMode && !moving ? "Click map to place" : "Place point"}
+                <span className="chevron" aria-hidden="true" />
+                <h2>Add point</h2>
               </button>
+              {placeOpen ? (
+                <>
+                  <input
+                    className="field"
+                    value={label}
+                    onChange={(e) => applyLabelHint(e.target.value)}
+                    placeholder="DP-12, H-3, ICP…"
+                    aria-label="New point label"
+                  />
+                  <select
+                    className="field"
+                    value={category}
+                    onChange={(e) => setCategory(e.target.value as MapPointCategory)}
+                    aria-label="Point type"
+                  >
+                    {CATEGORIES.map((c) => (
+                      <option key={c} value={c}>
+                        {CATEGORY_LABELS[c]}
+                      </option>
+                    ))}
+                  </select>
+                  <button type="button" className={placeMode && !moving ? "btn primary" : "btn"} onClick={() => setPlaceMode((v) => !v)}>
+                    {placeMode && !moving ? "Click map to place" : "Place point"}
+                  </button>
+                </>
+              ) : placeMode && !moving ? (
+                <span className="hint">Click map to place</span>
+              ) : null}
               {moving ? (
                 <>
                   <span className="move-hint">Click the map or drag the marker to move {moving.label}</span>

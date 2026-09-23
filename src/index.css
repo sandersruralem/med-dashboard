@@ -274,6 +274,10 @@ select {
   align-items: center;
 }
 
+.place-form .hint {
+  margin: 0;
+}
+
 .field,
 .btn {
   border: 1px solid var(--line);
@@ -696,7 +700,7 @@ select {
 
 /* Sit +/− under the white overlay instead of overlapping it. */
 .leaflet-host .leaflet-top {
-  top: 5.75rem;
+  top: var(--map-float-bottom, 5.75rem);
   z-index: 400;
 }
 
